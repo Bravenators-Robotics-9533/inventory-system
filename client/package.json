@@ -1,6 +1,8 @@
 {
-  "name": "inventory-system",
+  "name": "bravenators-inventory-client",
   "version": "0.1.0",
+  "author": "Nick Fanelli",
+  "license": "MIT License",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
