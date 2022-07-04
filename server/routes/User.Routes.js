@@ -1,9 +1,31 @@
 const router = require('express').Router();
 
+const User = require('../models/User.Model');
+
 router.route('/login').post((req, res) => {
 
-    res.send("Hello World");
+    const { userID } = req.body;
 
+    User.findOne({
+        "userID": userID
+    }).exec((err, user) => {
+        if(err) {
+            return res.status(400).json({ error: "Something went wrong with login..."});
+        } else {
+            if(user) {
+                res.json({user: user})
+            } else {
+                return res.status(401).json({
+                    error: "User does not exist"
+                });
+            }
+        }
+    });
+
+});
+
+router.route('/validate-token').get((req, res) => {
+    res.send(true);
 });
 
 module.exports = router;

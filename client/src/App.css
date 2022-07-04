@@ -1,0 +1,24 @@
+:root {
+    /* Light Theme Colors */
+    --light-bg-color: #f1f1f1;
+    --dark-bg-color: #141414;
+
+    --light-text-color: #000000;
+    --dark-text-color: #f1f1f1;
+}
+
+/* Background */
+#absolute-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -900 !important;
+}
+#light-theme #absolute-background { background-color: var(--light-bg-color); }
+#dark-theme #absolute-background { background-color: var(--dark-bg-color); }
+
+/* Text Color */
+#light-theme { color: var(--light-text-color); }
+#dark-theme { color: var(--dark-text-color); }
