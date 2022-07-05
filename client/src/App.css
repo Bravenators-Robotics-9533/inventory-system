@@ -1,5 +1,7 @@
 :root {
-    /* Light Theme Colors */
+    --red: #ff0000;
+    --green: #51ff51;
+
     --light-bg-color: #f1f1f1;
     --dark-bg-color: #141414;
 
@@ -9,7 +11,7 @@
 
 /* Background */
 #absolute-background {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;

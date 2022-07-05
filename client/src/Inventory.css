@@ -1,0 +1,99 @@
+section#inventory nav {
+    position: fixed;
+    top: 0;
+    left: 0; 
+    right: 0;
+    margin: 0;
+    height: 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2em;
+}
+
+#light-theme section#inventory nav {
+    background-color: var(--light-bg-color);
+}
+
+#dark-theme section#inventory nav {
+    background-color: var(--dark-bg-color);
+}
+
+section#inventory nav h1 {
+    margin: 0;
+}
+
+section#inventory .table-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+}
+
+section#inventory .controls .fa-icon {
+    font-size: 1.25rem;
+    margin: 0 0.5em;
+    cursor: pointer;
+}
+
+section#inventory .controls .fa-icon:hover {
+    filter: brightness(75%);
+}
+
+#dark-theme section#inventory table {
+    box-shadow: 0 0 40px #000000;
+}
+
+#light-theme section#inventory table {
+    box-shadow: 0 0 25px #9e9e9e;
+    color: black;
+}
+
+section#inventory table {
+    width: 85vw;
+    border-collapse: collapse;
+    color: white;
+    font-weight: 300;
+    font-family: 'Open Sans';
+    margin: 4em 0 4em 0;
+    border-radius: 10px;
+}
+
+section#inventory table thead {
+    height: 45px;
+    cursor: pointer;
+}
+
+section#inventory table thead th {
+    background-color: #36304a;
+}
+
+section#inventory table thead th:first-of-type {
+    border-radius: 10px 0 0 0;
+}
+
+section#inventory table thead th:last-of-type {
+    border-radius: 0 10px 0 0;
+}
+
+section#inventory table tbody tr {
+    height: 50px;
+    text-align: center;
+}
+
+section#inventory.add-mode nav {
+    color: var(--green);
+}
+
+section#inventory.add-mode table thead th {
+    background-color: var(--green);
+    color: black;
+}
+
+section#inventory.remove-mode nav {
+    color: var(--red);
+}
+
+section#inventory.remove-mode table thead th {
+    background-color: var(--red);
+    color: black;
+}
