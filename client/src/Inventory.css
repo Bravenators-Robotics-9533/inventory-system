@@ -29,6 +29,13 @@ section#inventory .table-wrapper {
     width: 100vw;
 }
 
+section#inventory .controls {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+    align-items: center;
+}
+
 section#inventory .controls .fa-icon {
     font-size: 1.25rem;
     margin: 0 0.5em;

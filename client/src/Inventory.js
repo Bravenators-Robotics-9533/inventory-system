@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear, faRepeat, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faGear, faRepeat, faPlus, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 import './Inventory.css'
 
@@ -104,7 +104,10 @@ export default function Inventory({ applicationState }) {
     return (
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>
-                <h1>{applicationState.userName}</h1>
+                <div className="controls"> 
+                    <FontAwesomeIcon icon={faArrowRightFromBracket} className="fa-icon" onClick={() => { applicationState.logout(); }} />
+                    <h1>{applicationState.userName}</h1>
+                </div>
                 <div className="controls">
                     <FontAwesomeIcon icon={faPlus} className="fa-icon" />
                     <FontAwesomeIcon icon={faRepeat} className="fa-icon" onClick={toggleCurrentMode} />

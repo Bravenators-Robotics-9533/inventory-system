@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { server } from './ServerAPI'
 import { ApplicationState } from './ApplicationState'
 
+import './Login.css'
+
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab/g;
 
 let keyLog = "";
@@ -79,11 +81,11 @@ export default function Login({ applicationState, setApplicationState }) {
     useEventListener("keydown", keyDownHandler);
 
     return (
-    
-        <div>
-            <h1>Please Scan Your ID</h1>
-        </div>
-
+        <section id="login">
+            <div className="content">
+                <h1>Please Scan Your ID</h1>
+            </div>
+        </section>
     );
 
 }
