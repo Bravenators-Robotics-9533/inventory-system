@@ -47,7 +47,7 @@ export default function Login({ applicationState, setApplicationState }) {
 
             ApplicationState.SaveSessionAccessToken(tokenID);
 
-            navigation("/inventory");
+            navigation("/projects");
         }).catch((error) => { // Failure
             if(error.response.status === 401) {
                 console.log("Invalid User");

@@ -1,5 +1,6 @@
 import Inventory from './Inventory';
 import Login from './Login';
+import Projects from './Projects';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
@@ -23,6 +24,8 @@ function App() {
     }, [applicationState, setApplicationState]);
 
     const loginView = <Login applicationState={applicationState} setApplicationState={setApplicationState} />;
+    const projectsView = <Projects applicationState={applicationState} />;
+
     const inventoryView = <Inventory applicationState={applicationState} />;
 
     return (
@@ -32,7 +35,7 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={loginView} />
-                    <Route path="inventory" element={inventoryView} />
+                    <Route path="projects" element={projectsView} />
                 </Routes>
             </Router>
         </div>

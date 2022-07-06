@@ -6,8 +6,8 @@ export class ApplicationState {
 
     #shouldNullify = false;
 
-    constructor(accessToken, userName, userType) {
-        this.accessToken = accessToken;
+    constructor(userID, userName, userType) {
+        this.userID = userID;
         this.userName = userName;
         this.userType = userType;
     }
