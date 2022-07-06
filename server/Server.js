@@ -21,9 +21,11 @@ if(process.env.NODE_ENV !== 'production') {
 
 // Get Routes
 const UserRoutes = require('./routes/User.Routes');
+const ProjectRoutes = require('./routes/Project.Routes');
 
 // Bind Routes
 app.use('/api/users', UserRoutes);
+app.use('/api/projects', ProjectRoutes);
 
 const uri = process.env.ATLAS_URI;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });

@@ -47,6 +47,6 @@ router.route('/get/:userID').get((req, res) => {
             }
         }
     });
-})
+});
 
 module.exports = router;

@@ -6,6 +6,11 @@ export const server = axios.create({
     baseURL: serverURL
 });
 
+export const UserType = {
+    Basic: "Basic",
+    Admin: "Admin"
+};
+
 // server.interceptors.response.use((response) => response, (error) => {
 //     console.error(error);
 
