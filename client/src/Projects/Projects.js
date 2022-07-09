@@ -5,7 +5,7 @@ import { faArrowRightFromBracket, faPlus } from '@fortawesome/free-solid-svg-ico
 
 import { useNavigate } from 'react-router-dom';
 
-import { server, UserType } from './ServerAPI'
+import { server, UserType } from '../ServerAPI'
 
 import './Projects.css'
 

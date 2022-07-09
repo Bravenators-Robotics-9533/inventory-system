@@ -2,8 +2,8 @@ import { useEffect, useRef, useCallback } from "react"
 
 import { useNavigate } from "react-router-dom";
 
-import { server } from './ServerAPI'
-import { ApplicationState } from './ApplicationState'
+import { server } from '../ServerAPI'
+import { ApplicationState } from '../ApplicationState'
 
 import './Login.css'
 

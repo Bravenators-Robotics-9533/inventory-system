@@ -1,6 +1,6 @@
-import Inventory from './Inventory';
-import Login from './Login';
-import Projects from './Projects';
+import Inventory from './Inventory/Inventory';
+import Login from './Login/Login';
+import Projects from './Projects/Projects';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
