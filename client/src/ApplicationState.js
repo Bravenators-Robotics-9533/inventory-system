@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-
 const UserAccessTokenSessionStorageID = "bravenators-inventory-system.sessionStorage.accessToken";
 
 export class ApplicationState {
@@ -14,6 +12,8 @@ export class ApplicationState {
 
     static SaveSessionAccessToken(accessToken) { sessionStorage.setItem(UserAccessTokenSessionStorageID, accessToken); }
     static GetSessionSavedAccessToken() { return sessionStorage.getItem(UserAccessTokenSessionStorageID); }
+
+    static IsUserRecoverable() { return sessionStorage.getItem(UserAccessTokenSessionStorageID) != null; }
 
     logout() {
         sessionStorage.removeItem(UserAccessTokenSessionStorageID);

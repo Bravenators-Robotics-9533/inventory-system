@@ -21,4 +21,20 @@ router.route('/get-all').get(authorize(AuthLevel.Admin), async(req, res) => {
     res.send(allProjects);
 });
 
+router.route('/get/:id').get(authorize(AuthLevel.Basic), async(req, res) => {
+
+    const user = req.user;
+    const { id } = req.params;
+
+    if(user.userType === "Admin") { // Admin
+
+        const project = await Project.findById(id);
+        return res.send(project);
+
+    } else {
+        res.sendStatus(403); // Forbidden
+    }
+
+})
+
 module.exports = router;

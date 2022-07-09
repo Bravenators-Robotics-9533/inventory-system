@@ -2,9 +2,6 @@ import { useEffect, useRef, useCallback } from "react"
 
 import { useNavigate } from "react-router-dom";
 
-import { server } from '../ServerAPI'
-import { ApplicationState } from '../ApplicationState'
-
 import './Login.css'
 
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab/g;
@@ -29,39 +26,23 @@ const useEventListener = (eventName, handler, element = window) => {
     }, [eventName, element]);
 }
 
-export default function Login({ applicationState, setApplicationState }) {
+export default function Login({ applicationState, processUserData, attemptUserRecovery }) {
 
     const navigation = useNavigate();
 
     const processData = useCallback((data) => {
-        const tokenID = data;
-    
-        server.post("/users/login", {
-            userID: tokenID
-        }).then((res) => { // Success
-            setApplicationState(new ApplicationState(
-                tokenID,
-                res.data.user.userName,
-                res.data.user.userType
-            ));
-
-            ApplicationState.SaveSessionAccessToken(tokenID);
-
-            navigation("/projects");
-        }).catch((error) => { // Failure
-            if(error.response.status === 401) {
-                console.log("Invalid User");
-            }
-        });
-    }, [setApplicationState, navigation]);
+        processUserData(data);
+    }, [processUserData]);
 
     // Read from session data
     useEffect(() => {
-        const tokenID = ApplicationState.GetSessionSavedAccessToken();
+        if(applicationState) {
+            navigation('/projects');
+            return;
+        }
 
-        if(tokenID)
-            processData(tokenID);
-    }, [processData]);
+        attemptUserRecovery();
+    }, [applicationState, attemptUserRecovery, navigation]);
 
     const keyDownHandler = ({ key }) => {
         if(key.match(ValidInputRegex)) {

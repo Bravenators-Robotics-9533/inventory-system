@@ -2,7 +2,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear, faRepeat, faPlus, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faGear, faRepeat, faPlus, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
+
+import { server } from "../ServerAPI";
+
+import { Outlet } from "react-router-dom";
 
 import './Inventory.css'
 
@@ -32,11 +36,13 @@ const processData = (data) => {
     console.log("Processing Data: \"" + data + "\"");
 }
 
-export default function Inventory({ applicationState }) {
+export default function Inventory({ applicationState, projectID }) {
 
     const navigation = useNavigate();
 
     const [isReady, setIsReady] = useState(false);
+    const [project, setProject] = useState(null);
+
     const [currentMode, setCurrentMode] = useState("add");
 
     const clearKeyLogInterval = useRef();
@@ -45,13 +51,19 @@ export default function Inventory({ applicationState }) {
     useEffect(() => {
 
         if(applicationState) {
-            // Validate against server
-            setIsReady(true);
+            // Get the current project
+            server.get(`/projects/get/${projectID}`, {
+                headers: { authorization: applicationState.userID }
+            }).then((res) => {
+                setProject(res.data);
+                setIsReady(true);
+            })
+
             return;
         }
 
         navigation("/");
-    }, [applicationState, navigation]);
+    }, [applicationState, navigation, setProject, projectID]);
 
     const keyDownHandler = ({ key }) => {
         if(key.match(ValidInputRegex)) {
@@ -86,28 +98,18 @@ export default function Inventory({ applicationState }) {
 
     useEventListener("keydown", keyDownHandler);
 
-    let items = [];
-
-    for(let i = 0; i < 100; i++) {
-        items.push(<tr>
-        <td>12-4-20</td>
-        <td>879384985734</td>
-        <td>Through Bore Bearing</td>
-        <td>REV Robotics</td>
-        <td>5</td>
-    </tr>);
-    }
-
     if(!isReady)
         return null;
 
     return (
+        <>
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>
                 <div className="controls"> 
-                    <FontAwesomeIcon icon={faArrowRightFromBracket} className="fa-icon" onClick={() => { applicationState.logout(); }} />
+                    <FontAwesomeIcon icon={faAngleLeft} className="fa-icon" onClick={() => { navigation('/projects'); }} />
                     <h1>{applicationState.userName}</h1>
                 </div>
+                <h1>{project.projectName}</h1>
                 <div className="controls">
                     <FontAwesomeIcon icon={faPlus} className="fa-icon" />
                     <FontAwesomeIcon icon={faRepeat} className="fa-icon" onClick={toggleCurrentMode} />
@@ -133,10 +135,11 @@ export default function Inventory({ applicationState }) {
                             <td>REV Robotics</td>
                             <td>5</td>
                         </tr>
-                        {items}
                     </tbody>
                 </table>     
             </div>
         </section>
+        <Outlet />
+        </>
     );
 }

@@ -1,15 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRightFromBracket, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRightFromBracket, faPlus, faGear } from '@fortawesome/free-solid-svg-icons'
+
+import { ApplicationState } from "../ApplicationState"
+
+import { Routes, Route } from 'react-router-dom';
 
 import { useNavigate } from 'react-router-dom';
 
 import { server, UserType } from '../ServerAPI'
 
 import './Projects.css'
+import Inventory from '../Inventory/Inventory';
 
-export default function Projects({ applicationState }) {
+export default function Projects({ applicationState, attemptUserRecovery }) {
 
     const navigation = useNavigate();
 
@@ -29,13 +34,22 @@ export default function Projects({ applicationState }) {
                 }).then((res) => {
                     setProjects(res.data);
                     setIsReady(true);
-                });
+                }).catch((res) => {
+                    const resStatus = res.response.status;
+                    
+                    // Basic User
+                    if(resStatus === 403) {
+                        // TODO: Load allowed projects
+                        setProjects([]);
+                        setIsReady(true);
+                    }
+                })
             });
 
             return;
         }
 
-        navigation('/');
+        attemptUserRecovery();
     }, [applicationState, navigation, setDbUser, setIsReady]);
 
     // Verify User Login
@@ -60,12 +74,15 @@ export default function Projects({ applicationState }) {
 
     }, [applicationState, loadFromDB]);
 
+    const loadProject = (projectID) => {
+        navigation(projectID)
+    }
+
     if(!isReady) 
         return null;
 
-    return (
+    const projectsPageElement = (
         <section id="projects">
-
             <div className="content">
                 <div className="control-panel">
                     <div>
@@ -80,18 +97,30 @@ export default function Projects({ applicationState }) {
                             </>
                             : null
                         }
+                        <FontAwesomeIcon icon={faGear} className="fa-icon" />
                     </div>
                 </div>
                 <ul>
                     {
                         projects.map((project) => {
-                            return <li key={project._id}>{project.projectName}</li>
+                            return <li key={project._id} onClick={() => { loadProject(project._id) }}>{project.projectName}</li>
                         })
                     }
                 </ul>
             </div>
-
         </section>
+    );
+
+    return (
+        <Routes>
+            <Route path="/" element={projectsPageElement} />
+            {
+                projects.map((project) => {
+                    return <Route key={project._id} path={`${project._id}`} 
+                    element={<Inventory applicationState={applicationState} projectID={project._id} />} />
+                })
+            }
+        </Routes>
     );
 
 }
