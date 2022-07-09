@@ -50,7 +50,7 @@ export default function Projects({ applicationState, attemptUserRecovery }) {
         }
 
         attemptUserRecovery();
-    }, [applicationState, navigation, setDbUser, setIsReady]);
+    }, [applicationState, setDbUser, setIsReady, attemptUserRecovery]);
 
     // Verify User Login
     useEffect(() => {

@@ -9,6 +9,7 @@ import { server } from "../ServerAPI";
 import { Outlet } from "react-router-dom";
 
 import './Inventory.css'
+import InventoryItem from "./InventoryItem";
 
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab/g;
 
@@ -45,25 +46,34 @@ export default function Inventory({ applicationState, projectID }) {
 
     const [currentMode, setCurrentMode] = useState("add");
 
+    const previousProjectData = useRef();
     const clearKeyLogInterval = useRef();
+    const refreshInterval = useRef();
+
+    const resyncProject = useCallback(() => {
+        server.get(`/projects/get/${projectID}`, {
+            headers: { authorization: applicationState.userID }
+        }).then((res) => {
+            const projectData = JSON.stringify(res.data);
+
+            if(projectData !== previousProjectData.current) {
+                setProject(res.data);
+                setIsReady(true);
+
+                previousProjectData.current = projectData;
+            }
+        })
+    }, [setIsReady, setProject, applicationState, projectID]);
 
     // Verify User Login
     useEffect(() => {
+        
+        clearInterval(refreshInterval.current);
+        refreshInterval.current = setInterval(resyncProject, 5000); // 5 seconds
 
-        if(applicationState) {
-            // Get the current project
-            server.get(`/projects/get/${projectID}`, {
-                headers: { authorization: applicationState.userID }
-            }).then((res) => {
-                setProject(res.data);
-                setIsReady(true);
-            })
+        resyncProject();
 
-            return;
-        }
-
-        navigation("/");
-    }, [applicationState, navigation, setProject, projectID]);
+    }, [resyncProject]);
 
     const keyDownHandler = ({ key }) => {
         if(key.match(ValidInputRegex)) {
@@ -94,6 +104,7 @@ export default function Inventory({ applicationState, projectID }) {
 
     useLayoutEffect(() => {
         clearInterval(clearKeyLogInterval.current);
+        clearInterval(refreshInterval.current);
     }, [clearKeyLogInterval]);
 
     useEventListener("keydown", keyDownHandler);
@@ -128,13 +139,11 @@ export default function Inventory({ applicationState, projectID }) {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>12-4-20</td>
-                            <td>879384985734</td>
-                            <td>Through Bore Bearing</td>
-                            <td>REV Robotics</td>
-                            <td>5</td>
-                        </tr>
+                        {
+                            project.inventoryItems.map((item) => {
+                                return <InventoryItem />
+                            })
+                        }
                     </tbody>
                 </table>     
             </div>
