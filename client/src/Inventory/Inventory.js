@@ -9,7 +9,11 @@ import { server } from "../ServerAPI";
 import { Outlet } from "react-router-dom";
 
 import './Inventory.css'
+
 import InventoryItem from "./InventoryItem";
+
+import Popup from "../Popup/Popup";
+import PopupInputField from "../Popup/PopupInputField"
 
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab/g;
 
@@ -45,6 +49,7 @@ export default function Inventory({ applicationState, projectID }) {
     const [project, setProject] = useState(null);
 
     const [currentMode, setCurrentMode] = useState("add");
+    const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(true);
 
     const previousProjectData = useRef();
     const clearKeyLogInterval = useRef();
@@ -102,6 +107,20 @@ export default function Inventory({ applicationState, projectID }) {
         setCurrentMode((curr) => { return curr === "add" ? "remove" : "add"});
     }, [setCurrentMode]);
 
+    const createNewItemBarcodeFieldRef = useRef();
+    const createNewItemManufacturerFieldRef = useRef();
+    const createNewItemItemNameFieldRef = useRef();
+    const createNewItemStartingQuantityFieldRef = useRef();
+
+    const createNewItem = () => {
+        const barcode = createNewItemBarcodeFieldRef.current.value;
+        const manufacturer = createNewItemManufacturerFieldRef.current.value;
+        const itemName = createNewItemItemNameFieldRef.current.value;
+        const startingQuantity = createNewItemStartingQuantityFieldRef.current.value;
+
+        console.log("Creating new item!");
+    }
+
     useLayoutEffect(() => {
         clearInterval(clearKeyLogInterval.current);
         clearInterval(refreshInterval.current);
@@ -114,6 +133,18 @@ export default function Inventory({ applicationState, projectID }) {
 
     return (
         <>
+        <Popup isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); }} 
+        onSubmit={createNewItem}>
+            <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} />
+            <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} />
+            <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} />
+            <PopupInputField key="Starting Quantity" name="Starting Quantity" startingValue={0} style={{width: "4em", textAlign: "center"}} 
+            ref={createNewItemStartingQuantityFieldRef} type="number" customValidationCallback={() => {
+                const value = createNewItemStartingQuantityFieldRef.current.value;
+                return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
+            }} />
+        </Popup>
+
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>
                 <div className="controls"> 
@@ -122,7 +153,7 @@ export default function Inventory({ applicationState, projectID }) {
                 </div>
                 <h1>{project.projectName}</h1>
                 <div className="controls">
-                    <FontAwesomeIcon icon={faPlus} className="fa-icon" />
+                    <FontAwesomeIcon icon={faPlus} className="fa-icon" onClick={() => { setIsNewItemPopupActive(true); }} />
                     <FontAwesomeIcon icon={faRepeat} className="fa-icon" onClick={toggleCurrentMode} />
                     <FontAwesomeIcon icon={faGear} className="fa-icon" />
                 </div>
