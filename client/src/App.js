@@ -12,8 +12,8 @@ import './App.css'
 function App() {
     const [applicationState, setApplicationState] = useState(null);
 
-    const [theme, setTheme] = useState("dark");
-    const toggleTheme = useCallback(() => { setTheme((currentTheme) => { return currentTheme === "light" ? "dark" : "light"})}, [setTheme]);
+    const [theme] = useState("dark");
+    // const toggleTheme = useCallback(() => { setTheme((currentTheme) => { return currentTheme === "light" ? "dark" : "light"})}, [setTheme]);
 
     // Check for application state should nullify
     useEffect(() => {

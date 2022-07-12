@@ -14,7 +14,9 @@ const projectSchema = new Schema({
         type: [Schema.Types.ObjectId]
     },
     inventoryItems: {
-        type: [Object]
+        type: Map,
+        of: Object,
+        default: {}
     }
 }, { timestamps: true });
 

@@ -15,7 +15,7 @@ import InventoryItem from "./InventoryItem";
 import Popup from "../Popup/Popup";
 import PopupInputField from "../Popup/PopupInputField"
 
-const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab/g;
+const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab|#|_/g;
 
 var keyLog = "";
 
@@ -37,19 +37,17 @@ const useEventListener = (eventName, handler, element = window) => {
     }, [eventName, element]);
 }
 
-const processData = (data) => {
-    console.log("Processing Data: \"" + data + "\"");
-}
-
 export default function Inventory({ applicationState, projectID }) {
 
     const navigation = useNavigate();
 
     const [isReady, setIsReady] = useState(false);
-    const [project, setProject] = useState(null);
+    const [project, setProject] = useState({inventoryItems: null});
+    
+    const [inventoryItemElements, setInventoryItemElements] = useState([]);
 
     const [currentMode, setCurrentMode] = useState("add");
-    const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(true);
+    const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
 
     const previousProjectData = useRef();
     const clearKeyLogInterval = useRef();
@@ -62,13 +60,61 @@ export default function Inventory({ applicationState, projectID }) {
             const projectData = JSON.stringify(res.data);
 
             if(projectData !== previousProjectData.current) {
-                setProject(res.data);
+                let rawProject = res.data;
+
+                setProject(rawProject);
                 setIsReady(true);
 
                 previousProjectData.current = projectData;
             }
         })
     }, [setIsReady, setProject, applicationState, projectID]);
+
+    const updateInventoryItem = useCallback((barcode, data) => {
+        server.post(`/projects/update-item`, {
+            projectID: project._id,
+            itemBarcode: barcode,
+            itemData: data
+        }, {
+            headers: { authorization: applicationState.userID }
+        }).then((res) => {
+            setProject(res.data.project);
+        })
+    }, [project, applicationState, setProject]);
+
+    const modifyItemQuantity = useCallback((barcode, value) => {
+
+        server.post(`/projects/modify-item-quantity`, {
+            projectID: project._id,
+            itemBarcode: barcode,
+            value: value
+        }, {
+            headers: { authorization: applicationState.userID } 
+        }).then((res) => {
+            setProject(res.data.project);
+        })
+    }, [project, applicationState, setProject]);
+
+    const processData = useCallback((data) => {
+        if((data.startsWith("Shift#") || data.startsWith("#")) && data.endsWith("#")) {
+
+            let specialData = data.split('#')[1];
+
+            if(specialData === "MODE_ADD") {
+                setCurrentMode("add")
+            } else if(specialData === "MODE_REMOVE") {
+                setCurrentMode("remove");
+            }
+
+            return;
+        }
+
+        if(currentMode === "add") {
+            modifyItemQuantity(data, 1);            
+        } else if(currentMode === "remove") {
+            modifyItemQuantity(data, -1);
+        }
+    }, [currentMode, modifyItemQuantity, setCurrentMode]);
 
     // Verify User Login
     useEffect(() => {
@@ -81,6 +127,9 @@ export default function Inventory({ applicationState, projectID }) {
     }, [resyncProject]);
 
     const keyDownHandler = ({ key }) => {
+        if(isNewItemPopupActive) // Ignore if in popup
+            return;
+
         if(key.match(ValidInputRegex)) {
             if(key === "Enter" || key === "Tab") { // Finish of Barcode
                 if(keyLog.trim()) {
@@ -103,6 +152,19 @@ export default function Inventory({ applicationState, projectID }) {
         // If not valid input key (do nothing)
     };
 
+    useEffect(() => {
+        
+        let elements = [];
+
+        for(let element in project.inventoryItems) {
+            const itemData = project.inventoryItems[element];
+            elements.push(<InventoryItem key={element} barcode={element} {...itemData} />)
+        }
+
+        setInventoryItemElements(elements)
+
+    }, [project.inventoryItems, setInventoryItemElements]);
+
     const toggleCurrentMode = useCallback(() => {
         setCurrentMode((curr) => { return curr === "add" ? "remove" : "add"});
     }, [setCurrentMode]);
@@ -112,14 +174,19 @@ export default function Inventory({ applicationState, projectID }) {
     const createNewItemItemNameFieldRef = useRef();
     const createNewItemStartingQuantityFieldRef = useRef();
 
-    const createNewItem = () => {
+    const createNewItem = useCallback(() => {
         const barcode = createNewItemBarcodeFieldRef.current.value;
         const manufacturer = createNewItemManufacturerFieldRef.current.value;
         const itemName = createNewItemItemNameFieldRef.current.value;
         const startingQuantity = createNewItemStartingQuantityFieldRef.current.value;
 
-        console.log("Creating new item!");
-    }
+        if(project.inventoryItems[barcode]) {
+            console.log("Hello");
+            return;
+        }
+
+        updateInventoryItem(barcode, { name: itemName, manufacturer: manufacturer, quantity: startingQuantity });
+    }, [project, updateInventoryItem]);
 
     useLayoutEffect(() => {
         clearInterval(clearKeyLogInterval.current);
@@ -162,7 +229,6 @@ export default function Inventory({ applicationState, projectID }) {
                 <table>
                     <thead onClick={toggleCurrentMode}>
                         <tr>
-                            <th>Date</th>
                             <th>Barcode</th>
                             <th>Name</th>
                             <th>Manufacturer</th>
@@ -170,11 +236,7 @@ export default function Inventory({ applicationState, projectID }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            project.inventoryItems.map((item) => {
-                                return <InventoryItem />
-                            })
-                        }
+                        {inventoryItemElements}
                     </tbody>
                 </table>     
             </div>

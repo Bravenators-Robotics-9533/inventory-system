@@ -36,7 +36,7 @@ const PopupInputField = ({ name, placeholder="", startingValue="", style, report
             onChange();
         }
 
-    }, [ref, startingValue]);
+    }, [ref, startingValue, onChange]);
 
     return (
         <div className="row input-field" key={name}>

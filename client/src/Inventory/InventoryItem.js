@@ -1,11 +1,10 @@
-export default function InventoryItem({}) {
+export default function InventoryItem({ barcode, name, manufacturer, quantity }) {
     return (
         <tr>
-            <td>12-4-20</td>
-            <td>879384985734</td>
-            <td>Through Bore Bearing</td>
-            <td>REV Robotics</td>
-            <td>5</td>
+            <td>{barcode}</td>
+            <td>{name}</td>
+            <td>{manufacturer}</td>
+            <td>{quantity}</td>
         </tr>
     );
 }
