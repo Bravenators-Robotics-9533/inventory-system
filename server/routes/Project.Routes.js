@@ -70,7 +70,6 @@ router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req
         return res.sendStatus(400); // Client Error
 
     if(user.userType === "Admin") { // Admin
-
         let project = await Project.findById(projectID);
 
         if(!project.inventoryItems.has(itemBarcode)) {

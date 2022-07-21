@@ -33,9 +33,11 @@ export default function Popup({ isActive = false, popupName = "", submitButtonNa
     useEffect(() => {
         let modifiedChildrenArray = [];
 
-        for(let i = 0; i < children.length; i++) {
-            const element = cloneElement(children[i], {reportValidation: reportValidation, ref: children[i].ref});
-            modifiedChildrenArray.push(element);
+        if(children) {
+            for(let i = 0; i < children.length; i++) {
+                const element = cloneElement(children[i], {reportValidation: reportValidation, ref: children[i].ref});
+                modifiedChildrenArray.push(element);
+            }
         }
 
         setModifiedChildren(modifiedChildrenArray);
@@ -52,7 +54,7 @@ export default function Popup({ isActive = false, popupName = "", submitButtonNa
         return null;
 
     return (
-        <section id="popup" key={popupName}>
+        <section className="popup" key={popupName}>
             <div className="box">
                 <div className="header">
                     <h1>{popupName}</h1>
@@ -61,10 +63,13 @@ export default function Popup({ isActive = false, popupName = "", submitButtonNa
                 <div className="content">
                     {modifiedChildren}
                 </div>
-                <div className="footer">
-                    <div></div>
-                    <button className="submit-btn" disabled={!isValid} onClick={submit}>{submitButtonName}</button>
-                </div>
+                {
+                    submitButtonName == null ? null :
+                    <div className="footer">
+                        <div></div>
+                        <button className="submit-btn" disabled={!isValid} onClick={submit}>{submitButtonName}</button>
+                    </div>
+                }
             </div>
         </section>
     )

@@ -9,14 +9,7 @@ section#inventory nav {
     justify-content: space-between;
     align-items: center;
     padding: 0 2em;
-}
-
-#light-theme section#inventory nav {
-    background-color: var(--light-bg-color);
-}
-
-#dark-theme section#inventory nav {
-    background-color: var(--dark-bg-color);
+    background-color: var(--bg-color);
 }
 
 section#inventory nav h1 {

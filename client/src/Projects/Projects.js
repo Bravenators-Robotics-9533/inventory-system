@@ -11,8 +11,9 @@ import { server, UserType } from '../ServerAPI'
 
 import './Projects.css'
 import Inventory from '../Inventory/Inventory';
+import SettingsPopup from '../Popup/SettingsPopup';
 
-export default function Projects({ applicationState, attemptUserRecovery }) {
+export default function Projects({ applicationState, attemptUserRecovery, theme, setTheme }) {
 
     const navigation = useNavigate();
 
@@ -20,6 +21,8 @@ export default function Projects({ applicationState, attemptUserRecovery }) {
 
     const [dbUser, setDbUser] = useState(null);
     const [projects, setProjects] = useState([]);
+
+    const [isSettingsPopupActive, setIsSettingsPopupActive] = useState(true);
 
     const loadFromDB = useCallback(() => {
         if(applicationState) {
@@ -80,6 +83,8 @@ export default function Projects({ applicationState, attemptUserRecovery }) {
         return null;
 
     const projectsPageElement = (
+        <>
+        <SettingsPopup isActive={isSettingsPopupActive} setIsActive={setIsSettingsPopupActive} theme={theme} setTheme={setTheme}></SettingsPopup>
         <section id="projects">
             <div className="content">
                 <div className="control-panel">
@@ -95,7 +100,7 @@ export default function Projects({ applicationState, attemptUserRecovery }) {
                             </>
                             : null
                         }
-                        <FontAwesomeIcon icon={faGear} className="fa-icon" />
+                        <FontAwesomeIcon icon={faGear} className="fa-icon" onClick={() => { setIsSettingsPopupActive(true);} } />
                     </div>
                 </div>
                 <ul>
@@ -107,6 +112,7 @@ export default function Projects({ applicationState, attemptUserRecovery }) {
                 </ul>
             </div>
         </section>
+        </>
     );
 
     return (
