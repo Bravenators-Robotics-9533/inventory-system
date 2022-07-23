@@ -15,6 +15,8 @@ import InventoryItem from "./InventoryItem";
 import Popup from "../Popup/Popup";
 import PopupInputField from "../Popup/PopupInputField"
 
+import ActionUndoPopup from "./ActionUndoPopup";
+
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab|#|_/g;
 
 var keyLog = "";
@@ -49,6 +51,8 @@ export default function Inventory({ applicationState, projectID }) {
     const [currentMode, setCurrentMode] = useState("add");
     const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
 
+    const actionUndoPopupRef = useRef();
+    
     const previousProjectData = useRef();
     const clearKeyLogInterval = useRef();
     const refreshInterval = useRef();
@@ -83,7 +87,6 @@ export default function Inventory({ applicationState, projectID }) {
     }, [project, applicationState, setProject]);
 
     const modifyItemQuantity = useCallback((barcode, value) => {
-
         server.post(`/projects/modify-item-quantity`, {
             projectID: project._id,
             itemBarcode: barcode,
@@ -92,7 +95,19 @@ export default function Inventory({ applicationState, projectID }) {
             headers: { authorization: applicationState.userID } 
         }).then((res) => {
             setProject(res.data.project);
-        })
+
+            actionUndoPopupRef.current.handleChange(barcode, value, () => {
+                server.post(`/projects/modify-item-quantity`, {
+                    projectID: project._id,
+                    itemBarcode: barcode,
+                    value: -(value)
+                }, {
+                    headers: { authorization: applicationState.userID } 
+                }).then((res) => {
+                    setProject(res.data.project);
+                });
+            });
+        });
     }, [project, applicationState, setProject]);
 
     const processData = useCallback((data) => {
@@ -211,6 +226,8 @@ export default function Inventory({ applicationState, projectID }) {
                 return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
             }} />
         </Popup>
+
+        <ActionUndoPopup ref={actionUndoPopupRef} />
 
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>

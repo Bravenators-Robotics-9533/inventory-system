@@ -1,0 +1,184 @@
+#action-undo-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#action-undo-popup .uncollapse-window {
+    position: fixed;
+    bottom: 0;
+    width: 50vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--offset-color);
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    opacity: 0%;
+
+    transition-delay: 0s;
+    -webkit-transition-delay: 0s;
+    -moz-transition-delay: 0s;
+
+    transition-duration: 0s;
+    -webkit-transition-duration: 0s;
+    -moz-transition-duration: 0s;
+}
+
+#action-undo-popup .uncollapse-window:hover {
+    background-color: var(--offset-hover-color);
+}
+
+#action-undo-popup .uncollapse-window .fa-icon {
+    font-size: 1.5rem;
+}
+
+#action-undo-popup.docked .uncollapse-window {
+    opacity: 100%;
+
+    transition-delay: 0.3s;
+    -webkit-transition-delay: 0.3s;
+    -moz-transition-delay: 0.3s;
+}
+
+#action-undo-popup .content {
+    background-color: var(--offset-color);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    bottom: 0;
+    min-height: 60px;
+    max-width: 65vw;
+    bottom: -100px;
+}
+
+#action-undo-popup .content:hover {
+    border-top-left-radius: 0px;
+    border-top: none;
+}
+
+#action-undo-popup .content .content-shadow {
+    border-radius: 10px;
+    box-shadow: 0 0 40px #000000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
+}  
+
+#action-undo-popup.show .content {
+    bottom: 0;
+}
+
+#action-undo-popup.positive .content {
+    border: solid 4px var(--green);
+}
+
+#action-undo-popup.negative .content {
+    border: solid 4px var(--red);
+}
+
+#action-undo-popup .content .text-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;   
+}
+
+#action-undo-popup .content h3 {
+    margin: 0.2em 0.75em;
+}
+
+#action-undo-popup .content .controls {
+    position: relative;
+    min-width: 100px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--offset-hover-color);
+    cursor: pointer;
+    margin: 0 0 0 0.75em;
+}
+
+#action-undo-popup.positive .content .controls:hover {
+    background-color: var(--green);
+}
+
+#action-undo-popup.negative .content .controls:hover {
+    background-color: var(--red);
+}
+
+#action-undo-popup .content .controls .undo-button {
+    font-size: 2rem;
+}
+
+#action-undo-popup .quantity {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    background-color: var(--offset-color);
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 25px;
+    cursor: pointer;
+    text-align: center;
+}
+
+#action-undo-popup.negative .quantity {
+    border: solid 4px var(--red);
+}
+
+#action-undo-popup.positive .quantity {
+    border: solid 4px var(--green);
+}
+
+#action-undo-popup .content .collapse-window {
+    position: absolute;
+    left: -4px;
+    right: -4px;
+    top: -28px;
+    text-align: center;
+    background-color: var(--offset-hover-color);
+    height: 25px;
+    top: 0px;
+    z-index: -1;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#action-undo-popup.positive .content .collapse-window:hover {
+    background-color: var(--green);
+}
+
+#action-undo-popup.negative .content .collapse-window:hover {
+    background-color: var(--red);
+}
+
+#action-undo-popup .content .collapse-window .fa-icon {
+    font-size: 1.5rem;
+}
+
+#action-undo-popup .content:hover .collapse-window {
+    top: -33px;
+}
+
+#action-undo-popup.negative .collapse-window {
+    border: solid 4px var(--red);
+}
+
+#action-undo-popup.positive .collapse-window {
+    border: solid 4px var(--green);
+}

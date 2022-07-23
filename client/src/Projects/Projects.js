@@ -22,7 +22,7 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
     const [dbUser, setDbUser] = useState(null);
     const [projects, setProjects] = useState([]);
 
-    const [isSettingsPopupActive, setIsSettingsPopupActive] = useState(true);
+    const [isSettingsPopupActive, setIsSettingsPopupActive] = useState(false);
 
     const loadFromDB = useCallback(() => {
         if(applicationState) {
