@@ -5,8 +5,9 @@ import { faX } from '@fortawesome/free-solid-svg-icons'
 
 import './Popup.css'
 import './SettingsPopup.css'
+import { server } from '../ServerAPI'
 
-export default function SettingsPopup({ dbUser, isActive = false, setIsActive, theme, setTheme }) {
+export default function SettingsPopup({ applicationState, dbUser, isActive = false, setIsActive, theme, setTheme }) {
     
     const [stateOptions, setStateOptions] = useState(null); 
     const [currentState, setCurrentState] = useState("General");
@@ -18,21 +19,43 @@ export default function SettingsPopup({ dbUser, isActive = false, setIsActive, t
     }
 
     useEffect(() => {
-        let options = {};
+        const call = async () => {
+            let options = {};
 
-        // General
-        options["General"] = (
-            <div>
-                <h3>Dark Theme</h3>
-                <input type="checkbox" name="" id="" defaultChecked={theme === "dark"} onChange={(e) => { setTheme(e.target.checked ? "dark" : "light"); }} />
-            </div>
-        );
+            // General
+            options["General"] = (
+                <div>
+                    <h3>Dark Theme</h3>
+                    <input type="checkbox" name="" id="" defaultChecked={theme === "dark"} onChange={(e) => { setTheme(e.target.checked ? "dark" : "light"); }} />
+                </div>
+            );
 
-        // Create LI Selections
-        liSelections.current = [];
-        for(let option in options) { liSelections.current.push(option); }
-        setStateOptions(options);
-    }, [dbUser, setStateOptions, setTheme, theme]);
+            if(dbUser.userType === "Admin") {
+                const res = await server.get('/users/get-all', {
+                    headers: { authorization: applicationState.userID }
+                });
+
+                const users = res.data;
+
+                options["Users"] = (
+                    <ul>
+                        {
+                            users.map((user) => {
+                                return <li key={user._id}>{user.userName}</li>
+                            })
+                        }
+                    </ul>
+                );
+            }
+
+            // Create LI Selections
+            liSelections.current = [];
+            for(let option in options) { liSelections.current.push(option); }
+            setStateOptions(options);
+        }
+
+        call();
+    }, [dbUser, setStateOptions, setTheme, theme, applicationState]);
 
     if(!isActive || !stateOptions)
         return null;
@@ -50,7 +73,7 @@ export default function SettingsPopup({ dbUser, isActive = false, setIsActive, t
                             {
                                 liSelections.current.map((selection) => {
                                     return (
-                                        <li key={selection} className={currentState === selection ? `selected` : null} onClick={() => { setCurrentState("General") }}><p>{selection}</p></li>
+                                        <li key={selection} className={currentState === selection ? `selected` : null} onClick={() => { setCurrentState(selection) }}><p>{selection}</p></li>
                                     )
                                 })
                             }

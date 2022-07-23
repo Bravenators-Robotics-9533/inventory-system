@@ -84,7 +84,7 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
 
     const projectsPageElement = (
         <>
-        <SettingsPopup dbUser={dbUser} isActive={isSettingsPopupActive} setIsActive={setIsSettingsPopupActive} theme={theme} setTheme={setTheme}></SettingsPopup>
+        <SettingsPopup applicationState={applicationState} dbUser={dbUser} isActive={isSettingsPopupActive} setIsActive={setIsSettingsPopupActive} theme={theme} setTheme={setTheme}></SettingsPopup>
         <section id="projects">
             <div className="content">
                 <div className="control-panel">

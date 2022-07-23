@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
+const { authorize, AuthLevel } = require('../middleware/AuthenticationMiddleware');
 const User = require('../models/User.Model');
 
 router.route('/login').post((req, res) => {
@@ -47,6 +48,11 @@ router.route('/get/:userID').get((req, res) => {
             }
         }
     });
+});
+
+router.route('/get-all').get(authorize(AuthLevel.Admin), async(req, res) => {
+    const users = await User.find();
+    res.send(users);
 });
 
 module.exports = router;
