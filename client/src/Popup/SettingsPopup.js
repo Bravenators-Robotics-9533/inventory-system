@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faX } from '@fortawesome/free-solid-svg-icons'
@@ -6,31 +6,35 @@ import { faX } from '@fortawesome/free-solid-svg-icons'
 import './Popup.css'
 import './SettingsPopup.css'
 
-export default function SettingsPopup({ isActive = false, setIsActive, theme, setTheme }) {
+export default function SettingsPopup({ dbUser, isActive = false, setIsActive, theme, setTheme }) {
+    
+    const [stateOptions, setStateOptions] = useState(null); 
+    const [currentState, setCurrentState] = useState("General");
+
+    const liSelections = useRef([]);
 
     const onClose = () => {
         setIsActive(false);
     }
 
-    const Controls = {
-        "General": (
-            <>
+    useEffect(() => {
+        let options = {};
+
+        // General
+        options["General"] = (
             <div>
                 <h3>Dark Theme</h3>
                 <input type="checkbox" name="" id="" defaultChecked={theme === "dark"} onChange={(e) => { setTheme(e.target.checked ? "dark" : "light"); }} />
             </div>
-            </>
-        ),
-        "Users": (
-            <>
-            <h1>Users</h1>
-            </>
-        )
-    };
+        );
 
-    const [currentState, setCurrentState] = useState("General");
+        // Create LI Selections
+        liSelections.current = [];
+        for(let option in options) { liSelections.current.push(option); }
+        setStateOptions(options);
+    }, [dbUser, setStateOptions, setTheme, theme]);
 
-    if(!isActive)
+    if(!isActive || !stateOptions)
         return null;
 
     return (
@@ -43,12 +47,17 @@ export default function SettingsPopup({ isActive = false, setIsActive, theme, se
                 <div className="content">
                     <div className="left">
                         <ul>
-                            <li className={currentState === "General" ? `selected` : null} onClick={() => { setCurrentState("General") }}>General</li>
-                            <li className={currentState === "Users" ? `selected` : null} onClick={() => { setCurrentState("Users") }}>Users</li>
+                            {
+                                liSelections.current.map((selection) => {
+                                    return (
+                                        <li key={selection} className={currentState === selection ? `selected` : null} onClick={() => { setCurrentState("General") }}><p>{selection}</p></li>
+                                    )
+                                })
+                            }
                         </ul>
                     </div>
                     <div className="right">
-                        {Controls[currentState]}
+                        {stateOptions[currentState]}
                     </div>
                 </div>
             </div>

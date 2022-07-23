@@ -5,7 +5,7 @@ import { faRotateLeft, faAngleDown, faAngleUp } from '@fortawesome/free-solid-sv
 
 import './ActionUndoPopup.css';
 
-const ActionUndoPopup = forwardRef(({}, ref) => {
+const ActionUndoPopup = forwardRef((props, ref) => {
 
     const [isVisible, setIsVisible] = useState(false);
     const [isDocked, setIsDocked] = useState(false);
