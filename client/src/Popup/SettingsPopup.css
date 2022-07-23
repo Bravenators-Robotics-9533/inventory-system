@@ -68,3 +68,47 @@ section#settings-popup .content .left ul li:first-of-type {
 section#settings-popup .content .left ul li:last-of-type {
     border-radius: 0px;
 }
+
+#settings-popup #users {
+    overflow-y: scroll;
+    height: 100%;
+    text-align: center;
+}
+
+#settings-popup #users ul {
+    list-style: none;
+    margin: 1em;
+}
+
+#settings-popup #users ul li {
+    background-color: var(--offset-color);
+    padding: 0.25em;
+    display: flex;
+    align-items: center;
+}
+
+#settings-popup #users ul li > * {
+    width: 33%;
+}
+
+#settings-popup #users ul li > p {
+    text-align: left;
+}
+
+#settings-popup #users ul li > span {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#settings-popup #users ul li .fa-icon {
+    margin: 0 0.5em;
+    cursor: pointer;
+}
+
+#settings-popup #users ul li:nth-child(2) {
+    background-color: var(--offset-hover-color);
+}
+
+#settings-popup #users button {
+    margin: 0 0 2em 0;
+}

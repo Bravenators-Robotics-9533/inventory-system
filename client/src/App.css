@@ -43,6 +43,6 @@ button {
 }
 
 button:hover {
-    background-color: var(--offset-color);
+    background-color: var(--offset-hover-color);
     color: var(--text-color);
 }

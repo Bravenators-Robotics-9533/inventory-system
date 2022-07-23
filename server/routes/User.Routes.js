@@ -55,4 +55,32 @@ router.route('/get-all').get(authorize(AuthLevel.Admin), async(req, res) => {
     res.send(users);
 });
 
+router.route('/:id').delete(authorize(AuthLevel.Admin), async(req, res) => {
+
+    const { id } = req.params;
+
+    if(!id)
+        return res.sendStatus(400); // Client Error
+
+    await User.findByIdAndDelete(id);
+
+    res.sendStatus(200); // OK
+});
+
+router.route('/').put(authorize(AuthLevel.Admin), async(req, res) => {
+
+    const { userName, userType, userID } = req.body;
+
+    if(!userName || !userType || !userID)
+        return res.sendStatus(400); // Client Error
+
+    // TODO: Verify Admin/Basic, naming collision and or userID collision
+
+    let user = new User({ userID, userType, userName });
+
+    user.save();
+
+    return res.send(user);
+})
+
 module.exports = router;
