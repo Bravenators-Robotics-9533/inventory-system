@@ -6,10 +6,12 @@
 .pnp.js
 /client/node_modules
 /server/node_modules
+/native/node_modules
 
 # environment variables
 /client/.env
 /server/.env
+/native/.env
 
 # testing
 /coverage
