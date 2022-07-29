@@ -4,10 +4,9 @@ export class ApplicationState {
 
     #shouldNullify = false;
 
-    constructor(userID, userName, userType) {
-        this.userID = userID;
-        this.userName = userName;
-        this.userType = userType;
+    constructor(accessToken, user) {
+        this.accessToken = accessToken;
+        this.user = user;
     }
 
     static SaveSessionAccessToken(accessToken) { sessionStorage.setItem(UserAccessTokenSessionStorageID, accessToken); }

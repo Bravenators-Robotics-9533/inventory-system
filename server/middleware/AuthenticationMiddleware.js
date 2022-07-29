@@ -1,3 +1,8 @@
+const { OAuth2Client } = require("google-auth-library");
+const googleAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/User.Model');
 
 const AuthLevel = {
@@ -13,27 +18,20 @@ const authorize = (permissionLevel) => {
         if(authToken == null)
             return res.sendStatus(401); // Unauthorized
 
-        // Verify Token
-        User.findOne({
-            "userID": authToken
-        }).exec((err, user) => {
-            if(err) {
-                return res.status(400).json({ error: "Something went wrong with login..."});
-            }
-            if(!user) {
-                return res.status(401).json({
-                    error: "User does not exist"
-                });
-            }
+        jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+            if(err) return res.status(401).send(err); // Unauthorized
 
-            if(!permissionLevel.includes(user.userType)) {
-                return res.sendStatus(403); // Forbidden
-            }
+            User.findById(user._id).then((result) => {
+                if(!permissionLevel.includes(result.userType)) {
+                    return res.sendStatus(403); // Forbidden
+                }
 
-            req.user = user;
-            next();
+                req.user = result;
+                next();
+
+            });
         });
     }
 }
 
-module.exports = { AuthLevel, authorize };
+module.exports = { AuthLevel, authorize, googleAuthClient };

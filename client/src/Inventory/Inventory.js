@@ -59,7 +59,7 @@ export default function Inventory({ applicationState, projectID }) {
 
     const resyncProject = useCallback(() => {
         server.get(`/projects/get/${projectID}`, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then((res) => {
             const projectData = JSON.stringify(res.data);
 
@@ -80,7 +80,7 @@ export default function Inventory({ applicationState, projectID }) {
             itemBarcode: barcode,
             itemData: data
         }, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then((res) => {
             setProject(res.data.project);
         })
@@ -92,7 +92,7 @@ export default function Inventory({ applicationState, projectID }) {
             itemBarcode: barcode,
             value: value
         }, {
-            headers: { authorization: applicationState.userID } 
+            headers: { authorization: applicationState.accessToken } 
         }).then((res) => {
             setProject(res.data.project);
 
@@ -102,7 +102,7 @@ export default function Inventory({ applicationState, projectID }) {
                     itemBarcode: barcode,
                     value: -(value)
                 }, {
-                    headers: { authorization: applicationState.userID } 
+                    headers: { authorization: applicationState.accessToken } 
                 }).then((res) => {
                     setProject(res.data.project);
                 });
@@ -233,7 +233,7 @@ export default function Inventory({ applicationState, projectID }) {
             <nav>
                 <div className="controls"> 
                     <FontAwesomeIcon icon={faAngleLeft} className="fa-icon" onClick={() => { navigation('/projects'); }} />
-                    <h1>{applicationState.userName}</h1>
+                    <h1>{applicationState.user.userName}</h1>
                 </div>
                 <h1>{project.projectName}</h1>
                 <div className="controls">

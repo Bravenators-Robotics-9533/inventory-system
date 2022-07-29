@@ -40,7 +40,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
             userType: "Basic",
             userID: userID   
         }, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then(() => {
             resync();
         });
@@ -51,7 +51,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
             return;
 
         server.delete(`/users/${user._id}`, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then((res) => {
             console.log(res)
             resync();
@@ -65,7 +65,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
         server.post(`/users/set-type/${userID}`, {
             type: type
         }, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then((res) => {
             resync();
         });
@@ -85,7 +85,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
 
             if(dbUser.userType === "Admin") {
                 const res = await server.get('/users/get-all', {
-                    headers: { authorization: applicationState.userID }
+                    headers: { authorization: applicationState.accessToken }
                 });
 
                 const users = res.data;

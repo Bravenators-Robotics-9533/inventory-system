@@ -13,7 +13,7 @@ import './Projects.css'
 import Inventory from '../Inventory/Inventory';
 import SettingsPopup from '../Popup/SettingsPopup';
 
-export default function Projects({ applicationState, attemptUserRecovery, theme, setTheme }) {
+export default function Projects({ applicationState, theme, setTheme }) {
 
     const navigation = useNavigate();
 
@@ -26,18 +26,19 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
 
     const loadFromDB = useCallback(() => {
         if(applicationState) {
-            // TODO: VALIDATE USER
-            server.get(`/users/get/${applicationState.userID}`).then((res) => {
+            server.get(`/users/get/${applicationState.user._id}`, {
+                headers: { authorization: applicationState.accessToken }
+            }).then((res) => {
                 setDbUser(res.data.user);
                 
                 server.get(`/projects/get-all`, {
-                    headers: { authorization: applicationState.userID }
+                    headers: { authorization: applicationState.accessToken }
                 }).then((res) => {
                     setProjects(res.data);
                     setIsReady(true);
                 }).catch((res) => {
                     const resStatus = res.response.status;
-                    
+                                        
                     // Basic User
                     if(resStatus === 403) {
                         // TODO: Load allowed projects
@@ -50,8 +51,8 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
             return;
         }
 
-        attemptUserRecovery();
-    }, [applicationState, setDbUser, setIsReady, attemptUserRecovery]);
+        console.error("Could not identify user!!!");
+    }, [applicationState, setDbUser, setIsReady]);
 
     // Verify User Login
     useEffect(() => {
@@ -68,7 +69,7 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
         server.post('/projects/create-new', {
             projectName: projectName
         }, {
-            headers: { authorization: applicationState.userID }
+            headers: { authorization: applicationState.accessToken }
         }).then((res) => {
             loadFromDB();
         })
@@ -89,7 +90,7 @@ export default function Projects({ applicationState, attemptUserRecovery, theme,
             <div className="content">
                 <div className="control-panel">
                     <div>
-                        <h1>{applicationState.userName}</h1>
+                        <h1>{applicationState.user.userName}</h1>
                         <FontAwesomeIcon icon={faArrowRightFromBracket} className="fa-icon" onClick={() => { applicationState.logout(); }} />
                     </div>
                     <div>

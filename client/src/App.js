@@ -1,8 +1,7 @@
-import Login from './Login/Login';
 import Projects from './Projects/Projects';
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
 
 import { server } from './ServerAPI';
 import { ApplicationState } from './ApplicationState';
@@ -14,18 +13,16 @@ const defineThemeColor = (varName, definition) => {
 }
 
 function App() {
-    const [applicationState, setApplicationState] = useState(null);
+    const [gsiScriptLoaded, setGsiScriptLoaded] = useState(false);
 
+    const [applicationState, setApplicationState] = useState(null);
     const [theme, setTheme] = useState("dark");
-    // const toggleTheme = useCallback(() => { setTheme((currentTheme) => { return currentTheme === "light" ? "dark" : "light"})}, [setTheme]);
 
     // Check for application state should nullify
     useEffect(() => {
-
         if(applicationState && applicationState.shouldNullify()) {
             setApplicationState(null);
         }
-
     }, [applicationState, setApplicationState]);
 
     // On Theme Change
@@ -46,54 +43,67 @@ function App() {
         defineThemeColor("green", "#51ff51");
     }, [theme]);
 
-    const processUserData = useCallback((data) => {
-        const tokenID = data;
-    
-        server.post("/users/login", {
-            userID: tokenID
-        }).then((res) => { // Success
-            setApplicationState(new ApplicationState(
-                tokenID,
-                res.data.user.userName,
-                res.data.user.userType
-            ));
-
-            ApplicationState.SaveSessionAccessToken(tokenID);
-
-        }).catch((error) => { // Failure
-            if(error.response.status === 401) {
-                console.log("Invalid User");
-            }
+    const handleCallbackResponse = useCallback((response) => {
+        server.post('/users/login', {
+            tokenID: response.credential
+        }).then((res) => {
+            setApplicationState(new ApplicationState(res.data.accessToken, res.data.user));
+            ApplicationState.SaveSessionAccessToken(res.data.accessToken);
         });
-    }, [setApplicationState]);
+    }, []);
+ 
+    useEffect(() => {
+        if(applicationState || gsiScriptLoaded) return;
 
-    const attemptUserRecovery = useCallback(() => {
+        const initializeGsi = () => {
+            if(!window.google || gsiScriptLoaded) return;
 
-        const prevUserID = ApplicationState.GetSessionSavedAccessToken();
-
-        if(prevUserID) {
-            processUserData(prevUserID);
-        } else {
-            if(window.location.pathname !== '/')
-                window.location = '/';
+            setGsiScriptLoaded(true);
+            window.google.accounts.id.initialize({
+                client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+                callback: handleCallbackResponse
+            });
         }
 
-    }, [processUserData]);
 
-    const loginView = <Login applicationState={applicationState} processUserData={processUserData} attemptUserRecovery={attemptUserRecovery} />;
-    const projectsView = <Projects applicationState={applicationState} attemptUserRecovery={attemptUserRecovery} theme={theme} setTheme={setTheme} />;
+        if(ApplicationState.IsUserRecoverable()) {
+            const accessToken = ApplicationState.GetSessionSavedAccessToken();
+
+            server.post('/users/verify-token', {
+                tokenID: accessToken
+            }).then((res) => {
+                setApplicationState(new ApplicationState(accessToken, res.data));
+            });
+        } 
+
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.onload = initializeGsi;
+        script.async = true;
+        script.id = "google-client-script"
+        document.querySelector("body")?.appendChild(script);
+
+        return () => {
+            window.google?.accounts.id.cancel();
+            document.getElementById("google-client-script")?.remove();
+        }
+    }, [handleCallbackResponse, gsiScriptLoaded, applicationState]);
 
     return (
         <>
         <div id={`${theme}-theme`} className="master-wrapper">
             <div id="absolute-background"></div>
+            { applicationState == null ?
+            <div id="signInDiv" className="g_id_signin"></div>
+            :
             <Router>
                 <Routes>
-                    <Route path="/" element={loginView} />
-                    <Route path="projects/*" element={projectsView} />
+                    <Route path="/" element={<Navigate to="projects"/>} />
+                    <Route path="projects/*" element={<Projects applicationState={applicationState} theme={theme} setTheme={setTheme} />} />
                     <Route path="*" element={<h1>NULL</h1>} />
                 </Routes>
             </Router>
+            }
         </div>
         </>
     );
