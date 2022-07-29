@@ -10,6 +10,7 @@
 # environment variables
 /client/.env
 /server/.env
+/native/node_modules
 
 # testing
 /coverage

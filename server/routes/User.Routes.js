@@ -81,6 +81,28 @@ router.route('/').put(authorize(AuthLevel.Admin), async(req, res) => {
     user.save();
 
     return res.send(user);
+});
+
+router.route('/set-type/:id').post(authorize(AuthLevel.Admin), async(req, res) => {
+
+    const { id } = req.params;
+    const { type } = req.body;
+
+    if(!id || !type)
+        return res.sendStatus(400); // Client Error
+
+    if(type !== "Admin" && type !== "Basic")
+        return res.sendStatus(400); // Client Error
+
+    let user = await User.findById(id);
+
+    if(!user)
+        return res.sendStatus(500); // Internal Server Error
+
+    user.userType = type;
+    user.save();
+
+    res.send(user);
 })
 
 module.exports = router;

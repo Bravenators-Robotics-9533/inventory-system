@@ -16,9 +16,16 @@ router.route('/create-new').post(authorize(AuthLevel.Admin), async(req, res) => 
     res.status(200).send(project); // OK
 });
 
-router.route('/get-all').get(authorize(AuthLevel.Admin), async(req, res) => {
-    const allProjects = await Project.find();
-    res.send(allProjects);
+router.route('/get-all').get(authorize(AuthLevel.Basic), async(req, res) => {
+
+    const user = req.user;
+
+    if(user.userType === "Admin") {
+        const allProjects = await Project.find();
+        res.send(allProjects);
+    } else {
+        res.send([]);
+    }
 });
 
 router.route('/get/:id').get(authorize(AuthLevel.Basic), async(req, res) => {

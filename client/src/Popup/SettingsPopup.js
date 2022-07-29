@@ -47,12 +47,28 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
     }, [applicationState, resync]);
 
     const deleteUser = useCallback((user) => {
+        if(!window.confirm("Are you sure you want to delete this user?"))
+            return;
+
         server.delete(`/users/${user._id}`, {
             headers: { authorization: applicationState.userID }
         }).then((res) => {
             console.log(res)
             resync();
         })
+    }, [applicationState, resync]);
+
+    const modifyUserType = useCallback((userID, type) => {
+        if(!window.confirm("Are you sure you want to modify this user's permission level?"))
+            return;
+
+        server.post(`/users/set-type/${userID}`, {
+            type: type
+        }, {
+            headers: { authorization: applicationState.userID }
+        }).then((res) => {
+            resync();
+        });
     }, [applicationState, resync]);
 
     useEffect(() => {
@@ -85,7 +101,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
                                         <p>{user.userName}{user._id === dbUser._id ? " (me)" : null}</p>
                                         {
                                             user._id !== dbUser._id ?
-                                            <select defaultValue={user.userType} onChange={() => {}} >
+                                            <select defaultValue={user.userType} onChange={(e) => { modifyUserType(user._id, e.target.value) }} >
                                                 <option value="Basic">Standard</option>
                                                 <option value="Admin">Admin</option>
                                             </select>
@@ -116,7 +132,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
 
         if(shouldRecreate != null)
             call();
-    }, [shouldRecreate, dbUser, setStateOptions, setTheme, theme, applicationState, deleteUser, createNewUser]);
+    }, [shouldRecreate, dbUser, setStateOptions, setTheme, theme, applicationState, deleteUser, modifyUserType, createNewUser]);
 
     if(!isActive || !stateOptions)
         return null;
