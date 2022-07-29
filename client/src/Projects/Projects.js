@@ -12,6 +12,7 @@ import { server, UserType } from '../ServerAPI'
 import './Projects.css'
 import Inventory from '../Inventory/Inventory';
 import SettingsPopup from '../Popup/SettingsPopup';
+import Projects404 from './Projects404';
 
 export default function Projects({ applicationState, theme, setTheme }) {
 
@@ -125,6 +126,7 @@ export default function Projects({ applicationState, theme, setTheme }) {
                     element={<Inventory applicationState={applicationState} projectID={project._id} />} />
                 })
             }
+            <Route path="*" element={<Projects404 />}/>
         </Routes>
     );
 
