@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useNavigate } from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear, faRepeat, faPlus, faAngleLeft } from '@fortawesome/free-solid-svg-icons'
+import { faGear, faRepeat, faPlus, faAngleLeft, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 
 import { server } from "../ServerAPI";
 
@@ -50,10 +50,14 @@ export default function Inventory({ applicationState, projectID }) {
 
     const [currentMode, setCurrentMode] = useState("add");
     const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
+    const [isSearchDisplayed, setIsSearchDisplayed] = useState(false);
+    const [currentSearchText, setCurrentSearchText] = useState(null);
 
     const actionUndoPopupRef = useRef();
+    const searchInputRef = useRef();
     
     const previousProjectData = useRef();
+
     const clearKeyLogInterval = useRef();
     const refreshInterval = useRef();
 
@@ -173,7 +177,8 @@ export default function Inventory({ applicationState, projectID }) {
 
         for(let element in project.inventoryItems) {
             const itemData = project.inventoryItems[element];
-            elements.push(<InventoryItem key={element} barcode={element} {...itemData} />)
+            elements.push({element: element, itemData: itemData});
+            // elements.push(<InventoryItem key={element} barcode={element} {...itemData} />)
         }
 
         setInventoryItemElements(elements)
@@ -239,6 +244,14 @@ export default function Inventory({ applicationState, projectID }) {
                 <div className="controls">
                     <FontAwesomeIcon icon={faPlus} className="fa-icon" onClick={() => { setIsNewItemPopupActive(true); }} />
                     <FontAwesomeIcon icon={faRepeat} className="fa-icon" onClick={toggleCurrentMode} />
+                    <input type="text" name="part-search" className={isSearchDisplayed ? "displayed" : null} id="part-search" placeholder="Search..." ref={searchInputRef}
+                    onChange={(e) => { setCurrentSearchText(e.target.value.toLowerCase()); }} />
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className="fa-icon" onClick={() => { setIsSearchDisplayed((curr) => { 
+                        if(curr) setCurrentSearchText(null);
+                        else setCurrentSearchText(searchInputRef.current.value);
+
+                        return !curr; 
+                    })}} />
                     <FontAwesomeIcon icon={faGear} className="fa-icon" />
                 </div>
             </nav>
@@ -253,7 +266,12 @@ export default function Inventory({ applicationState, projectID }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {inventoryItemElements}
+                        {
+                            inventoryItemElements.map((element) => {
+                                return <InventoryItem key={element.element} barcode={element.element} searchQuery={currentSearchText} 
+                                {...element.itemData} />
+                            })
+                        }
                     </tbody>
                 </table>     
             </div>
