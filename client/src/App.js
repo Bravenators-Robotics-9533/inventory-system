@@ -73,7 +73,9 @@ function App() {
                 tokenID: accessToken
             }).then((res) => {
                 setApplicationState(new ApplicationState(accessToken, res.data));
-            });
+            }).catch(() => {
+                ApplicationState.SaveSessionAccessToken(undefined);
+            })
         } 
 
         const script = document.createElement("script");
