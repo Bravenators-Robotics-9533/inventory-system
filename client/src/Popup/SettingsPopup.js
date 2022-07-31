@@ -7,6 +7,8 @@ import './Popup.css'
 import './SettingsPopup.css'
 import { server } from '../ServerAPI'
 
+import QRCode from "react-qr-code"
+
 export default function SettingsPopup({ applicationState, dbUser, isActive = false, setIsActive, theme, setTheme, project = null, setProject = undefined }) {
     
     const [shouldRecreate, setShouldRecreate] = useState(false);
@@ -123,6 +125,12 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
                         </ul>
                     </section>
                 );
+
+                options["Tethered Devices"] = (
+                    <section id="tethered-devices">
+                        <QRCode value={applicationState.accessToken} />
+                    </section>
+                )
 
                 if(project != null) { // This Project
 
