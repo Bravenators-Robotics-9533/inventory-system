@@ -1,13 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import BarcodeScanner from './BarcodeScanner';
+import Login from './Login';
 
 export default function App() {
+
     return (
     <View style={styles.container}>
-        
-        <BarcodeScanner />
+
+        <Login />
 
         <StatusBar style="auto" />
     </View>
