@@ -68,6 +68,13 @@ router.route('/update-item').post(authorize(AuthLevel.Basic), async(req, res) =>
 
 });
 
+/*
+ * Client Error Codes
+ *
+ * N/A -> Invalid Body Req
+ * 1 -> Item doesn't exist
+ * 2 -> Attempting to remove an item from an already zero quantity
+ */
 router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req, res) => {
 
     const user = req.user;
@@ -80,14 +87,14 @@ router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req
         let project = await Project.findById(projectID);
 
         if(!project.inventoryItems.has(itemBarcode)) {
-            return res.sendStatus(400); // Client Error
+            return res.status(400).send({clientErrorCode: 1}); // Client Error
         }
 
         let data = project.inventoryItems.get(itemBarcode);
         data.quantity = Number.parseInt(data.quantity) + value;
 
         if(data.quantity < 0) {
-            return res.status(400).send({error: "Can not have a value less than 0"});
+            return res.status(400).send({clientErrorCode: 2}); // Client Error
         }
 
         project.inventoryItems.set(itemBarcode, data);

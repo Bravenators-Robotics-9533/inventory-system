@@ -14,8 +14,12 @@ import InventoryItem from "./InventoryItem";
 
 import Popup from "../Popup/Popup";
 import PopupInputField from "../Popup/PopupInputField"
+import ErrorPopup from "./ErrorPopup";
 
 import ActionUndoPopup from "./ActionUndoPopup";
+
+import useSound from "use-sound";
+import { addItemSound, removeItemSound } from "../Sound/Sound";
 
 const ValidInputRegex = /[0-9a-zA-Z]|Enter|Tab|#|_/g;
 
@@ -53,7 +57,12 @@ export default function Inventory({ applicationState, projectID }) {
     const [isSearchDisplayed, setIsSearchDisplayed] = useState(false);
     const [currentSearchText, setCurrentSearchText] = useState(null);
 
+    const [playAddItemSound] = useSound(addItemSound, { volume: 0.5 });
+    const [playRemoveItemSound] = useSound(removeItemSound, { volume: 0.5 });
+
     const actionUndoPopupRef = useRef();
+    const errorPopupRef = useRef();
+    
     const searchInputRef = useRef();
     
     const previousProjectData = useRef();
@@ -98,8 +107,15 @@ export default function Inventory({ applicationState, projectID }) {
         }, {
             headers: { authorization: applicationState.accessToken } 
         }).then((res) => {
+            if(value > 0) {
+                playAddItemSound();
+            } else {
+                playRemoveItemSound();
+            }
+
             setProject(res.data.project);
 
+            // Reversal of this action
             actionUndoPopupRef.current.handleChange(barcode, value, () => {
                 server.post(`/projects/modify-item-quantity`, {
                     projectID: project._id,
@@ -111,8 +127,19 @@ export default function Inventory({ applicationState, projectID }) {
                     setProject(res.data.project);
                 });
             });
+        }).catch(err => {
+            const clientErrorCode = err?.response?.data?.clientErrorCode;
+
+            if(!clientErrorCode)
+                return;
+
+            if(clientErrorCode === 1) {
+                console.log("Unknown Item!");
+            } else if(clientErrorCode === 2) { // Attempting to change quantity to less than 0
+                errorPopupRef.current.runError("Invalid Item Quantity", "Item quantity is already 0. Maybe you meant to add it?");
+            }
         });
-    }, [project, applicationState, setProject]);
+    }, [project, applicationState, setProject, playAddItemSound, playRemoveItemSound]);
 
     const processData = useCallback((data) => {
         if((data.startsWith("Shift#") || data.startsWith("#")) && data.endsWith("#")) {
@@ -233,6 +260,7 @@ export default function Inventory({ applicationState, projectID }) {
         </Popup>
 
         <ActionUndoPopup ref={actionUndoPopupRef} />
+        <ErrorPopup ref={errorPopupRef} />
 
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>
