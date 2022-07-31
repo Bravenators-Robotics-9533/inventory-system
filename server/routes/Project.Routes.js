@@ -107,6 +107,51 @@ router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req
         
     }
 
+});
+
+router.route('/add-user-to-project').put(authorize(AuthLevel.Admin), async (req, res) => {
+    const { projectID, targetUserID } = req.body;
+
+    if(!projectID || !targetUserID)
+        return res.send(400); // Bad Request
+
+    let targetProject = await Project.findById(projectID);
+
+    if(!targetProject)
+        return res.send(400); // Bad Request
+
+    // TODO: verify the user id is valid
+
+    targetProject.allowedUsers.push(targetUserID);
+    targetProject.markModified("allowedUsers");
+    targetProject.save();
+
+    return res.send(targetProject); // OK
+});
+
+router.route('/remove-user-from-project').post(authorize(AuthLevel.Admin), async (req, res) => {
+    const { projectID, targetUserID } = req.body;
+
+    if(!projectID || !targetUserID)
+        return res.send(400); // Bad Request
+
+    let targetProject = await Project.findById(projectID);
+
+    if(!targetProject)
+        return res.send(400); // Bad Request
+
+    // TODO: verify the user id is valid
+
+    let index = targetProject.allowedUsers.indexOf(targetUserID);
+
+    if(index === -1)
+        return res.send(400); // Bad Request
+
+    targetProject.allowedUsers.splice(index, 1);
+    targetProject.markModified("allowedUsers");
+    targetProject.save();
+
+    return res.send(targetProject); // OK
 })
 
 module.exports = router;

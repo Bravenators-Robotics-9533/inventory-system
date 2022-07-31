@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCopy, faTrash, faX } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faTrash, faX, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 import './Popup.css'
 import './SettingsPopup.css'
 import { server } from '../ServerAPI'
 
-export default function SettingsPopup({ applicationState, dbUser, isActive = false, setIsActive, theme, setTheme }) {
+export default function SettingsPopup({ applicationState, dbUser, isActive = false, setIsActive, theme, setTheme, project = null, setProject = undefined }) {
     
     const [shouldRecreate, setShouldRecreate] = useState(false);
 
@@ -90,7 +90,8 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
 
                 const users = res.data;
 
-                options["Users"] = (
+                // Global Users
+                options["Global Users"] = (
                     <section id="users">
                         <ul>
                             <button onClick={createNewUser}>New User</button>
@@ -122,6 +123,85 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
                         </ul>
                     </section>
                 );
+
+                if(project != null) { // This Project
+
+                    let projectAllowedUsers = [];
+
+                    project.allowedUsers.forEach((user) => {
+                        users.every(rawUser => {
+                            if(user === rawUser._id) {
+                                projectAllowedUsers.push(rawUser);
+                                return false;
+                            }
+
+                            return true;
+                        })
+                    });
+
+                    options["This Project"] = (
+                        <section id="this-project">
+                            <h1>Allowed Users</h1>
+                            <ul className='users-list possible-users-list'>
+                                {
+                                    projectAllowedUsers.map(user => {
+                                        return <li key={user._id}>
+                                            {user.userName}
+                                            <FontAwesomeIcon className="fa-icon" icon={faTrash} onClick={() => {
+                                                server.post(`/projects/remove-user-from-project`, {
+                                                    projectID: project._id,
+                                                    targetUserID: user._id
+                                                }, {
+                                                    headers: { authorization: applicationState.accessToken }
+                                                }).then((res) => {
+                                                    setProject(res.data);
+                                                })
+                                            }} />
+                                        </li>
+                                    })
+                                }
+                            </ul>
+                            <div className="divider"></div>
+                            <h1>Possible Users</h1>
+                            <ul className="users-list possible-users-list">
+                                {
+                                    users.map((user) => {
+                                        let shouldReturn = false;
+
+                                        projectAllowedUsers.every(iUser => {
+                                            if(iUser._id === user._id) {
+                                                shouldReturn = true;
+                                                return false;
+                                            }
+
+                                            return true;
+                                        })
+
+                                        if(shouldReturn)
+                                            return null;
+
+                                        return (
+                                        <li key={user._id}>
+                                            <p>{user.userName}{user._id === dbUser._id ? " (me)" : null}</p>
+                                            <FontAwesomeIcon className="fa-icon" icon={faPlus} onClick={() => {
+                                                // Add User to Project + Resync
+                                                server.put(`/projects/add-user-to-project`, {
+                                                    projectID: project._id,
+                                                    targetUserID: user._id
+                                                }, {
+                                                    headers: { authorization: applicationState.accessToken }
+                                                }).then((res) => {
+                                                    setProject(res.data);
+                                                })
+                                            }} />
+                                        </li>
+                                        );
+                                    })
+                                }
+                            </ul>
+                        </section>
+                    )
+                }
             }
 
             // Create LI Selections
@@ -132,7 +212,7 @@ export default function SettingsPopup({ applicationState, dbUser, isActive = fal
 
         if(shouldRecreate != null)
             call();
-    }, [shouldRecreate, dbUser, setStateOptions, setTheme, theme, applicationState, deleteUser, modifyUserType, createNewUser]);
+    }, [shouldRecreate, dbUser, setStateOptions, setTheme, theme, applicationState, deleteUser, modifyUserType, createNewUser, project, setProject]);
 
     if(!isActive || !stateOptions)
         return null;

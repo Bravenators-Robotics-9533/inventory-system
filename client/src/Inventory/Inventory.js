@@ -15,6 +15,7 @@ import InventoryItem from "./InventoryItem";
 import Popup from "../Popup/Popup";
 import PopupInputField from "../Popup/PopupInputField"
 import ErrorPopup from "./ErrorPopup";
+import SettingsPopup from "../Popup/SettingsPopup"
 
 import ActionUndoPopup from "./ActionUndoPopup";
 
@@ -43,7 +44,7 @@ const useEventListener = (eventName, handler, element = window) => {
     }, [eventName, element]);
 }
 
-export default function Inventory({ applicationState, projectID }) {
+export default function Inventory({ applicationState, projectID, dbUser, theme, setTheme }) {
 
     const navigation = useNavigate();
 
@@ -56,6 +57,7 @@ export default function Inventory({ applicationState, projectID }) {
     const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
     const [isSearchDisplayed, setIsSearchDisplayed] = useState(false);
     const [currentSearchText, setCurrentSearchText] = useState(null);
+    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
 
     const [playAddItemSound] = useSound(addItemSound, { volume: 0.5 });
     const [playRemoveItemSound] = useSound(removeItemSound, { volume: 0.5 });
@@ -261,6 +263,7 @@ export default function Inventory({ applicationState, projectID }) {
 
         <ActionUndoPopup ref={actionUndoPopupRef} />
         <ErrorPopup ref={errorPopupRef} />
+        <SettingsPopup applicationState={applicationState} dbUser={dbUser} isActive={isSettingsVisible} setIsActive={setIsSettingsVisible} theme={theme} setTheme={setTheme} project={project} setProject={setProject} />
 
         <section id="inventory" className={`${currentMode}-mode`}>
             <nav>
@@ -280,7 +283,7 @@ export default function Inventory({ applicationState, projectID }) {
 
                         return !curr; 
                     })}} />
-                    <FontAwesomeIcon icon={faGear} className="fa-icon" />
+                    <FontAwesomeIcon icon={faGear} className="fa-icon" onClick={() => setIsSettingsVisible(true)} />
                 </div>
             </nav>
             <div className="table-wrapper">

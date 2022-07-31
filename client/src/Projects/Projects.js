@@ -123,7 +123,7 @@ export default function Projects({ applicationState, theme, setTheme }) {
             {
                 projects.map((project) => {
                     return <Route key={project._id} path={`${project._id}`} 
-                    element={<Inventory applicationState={applicationState} projectID={project._id} />} />
+                    element={<Inventory applicationState={applicationState} projectID={project._id} dbUser={dbUser} theme={theme} setTheme={setTheme} />} />
                 })
             }
             <Route path="*" element={<Projects404 />}/>
