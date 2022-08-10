@@ -3,17 +3,25 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import Login from './Login';
+import EntryStack from './routes/EntryStack';
 
 export default function App() {
 
-    return (
-    <View style={styles.container}>
+    const [applicationState, setApplicationState] = useState(null);
 
-        <Login />
-
-        <StatusBar style="auto" />
-    </View>
-    );
+    if(!applicationState) {
+        return (
+            <View style={styles.container}>
+                <Login setApplicationState={setApplicationState} />
+                <StatusBar style="auto" />
+            </View>
+        );
+    }
+    else {
+        return (
+            <EntryStack screenProps={{applicationState: applicationState}} />
+        )
+    }
 }
 
 const styles = StyleSheet.create({

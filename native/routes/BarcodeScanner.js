@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, SafeAreaView } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner'
 import { useEffect, useState } from 'react';
 
@@ -6,7 +6,7 @@ export default function BarcodeScanner({}) {
 
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
-    const [text, setText] = useState("Not Scanned Yet");
+    const [scanData, setScanData] = useState("Not Scanned Yet");
 
     const askForCameraPermissions = () => {
         (async () => {
@@ -22,7 +22,7 @@ export default function BarcodeScanner({}) {
 
     const handleBarCodeScanned = ({type, data}) => {
         setScanned(true);
-        setText(data);
+        setScanData(data);
         console.log(`Type: ${type} \nData: ${data}`);
     }
 
@@ -45,16 +45,25 @@ export default function BarcodeScanner({}) {
     }
 
     return (
-        <View>
-            <View style={styles.barcodebox}>
-                <BarCodeScanner 
-                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                style={{height: 400, width: 400}}
-                />
-            </View>
-            <Text style={styles.maintext}>{text}</Text>
-
-            {scanned && <Button title={"Scan Again"} onPress={() => setScanned(false)} color="tomato" />}
+        <View style={styles.container}>
+            <SafeAreaView>
+                <View>
+                    <Text style={styles.maintext}>Scanning...</Text>
+                    <View style={styles.barcodebox}>
+                        {
+                            !scanned ? 
+                            <BarCodeScanner 
+                            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                            style={{height: 400, width: 400}}
+                            />
+                            : null
+                        }
+                    </View>
+                </View>
+                <View style={styles.bottomView}>
+                    {scanned && <Button title={"Scan Again"} onPress={() => setScanned(false)} color="tomato" />}
+                </View>
+            </SafeAreaView>
         </View>
     )
 }
@@ -73,5 +82,10 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 20,
         margin: 20
+    },
+    container: {
+        alignItems: 'center',
+        justifyContent: "space-between",
+        height: "100%"
     }
 })

@@ -2,14 +2,26 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { server } from './ServerAPI';
 
-export default function Login({ }) {
+import { ApplicationState } from "./ApplicationState"
+
+export default function Login({ setApplicationState }) {
 
     const [hasScanned, setHasScanned] = useState(false);
 
     const onScan = useCallback(({data}) => {
         setHasScanned(true);
-    }, [setHasScanned]);
+
+        server.post(`users/verify-token`, {
+            tokenID: data
+        }).then(res => {
+            setApplicationState(new ApplicationState(data, res.data));
+        }).catch(err => {
+            console.log("Error" + err);
+        })
+
+    }, [setHasScanned, setApplicationState]);
 
     if(!hasScanned) {
         return (
