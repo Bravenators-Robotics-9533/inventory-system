@@ -12,6 +12,23 @@ section#inventory nav {
     background-color: var(--bg-color);
 }
 
+section#inventory nav .itype-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+section#inventory nav .itype-controls .fa-icon {
+    font-size: 1.25rem;
+    margin: 0 1em;
+    cursor: pointer;
+}
+
+section#inventory nav .itype-controls .fa-icon.selected {
+    box-shadow: 0 0 40px #000000;
+    color: rgb(67, 155, 255);
+}
+
 section#inventory nav h1 {
     margin: 0;
 }
@@ -85,20 +102,12 @@ section#inventory table tbody tr td > .highlighted {
     color: black;
 }
 
-section#inventory.add-mode nav {
-    color: var(--green);
-}
-
-section#inventory.add-mode table thead th {
+section#inventory table.add thead th {
     background-color: var(--green);
     color: black;
 }
 
-section#inventory.remove-mode nav {
-    color: var(--red);
-}
-
-section#inventory.remove-mode table thead th {
+section#inventory table.remove thead th {
     background-color: var(--red);
     color: black;
 }
