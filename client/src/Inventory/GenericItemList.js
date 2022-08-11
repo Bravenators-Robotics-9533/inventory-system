@@ -164,7 +164,7 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
                 }} />
             </Popup>
 
-            <div className="table-wrapper" id="generic-item-lits">
+            <div className="table-wrapper" id="generic-item-list">
                 <table className={currentMode}>
                     <thead onClick={toggleCurrentMode}>
                         <tr>

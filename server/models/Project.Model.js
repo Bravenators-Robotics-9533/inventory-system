@@ -17,6 +17,12 @@ const projectSchema = new Schema({
         type: Map,
         of: Object,
         default: {}
+    },
+    assets: {
+        type: Object,
+        default: {
+            __index__: 0
+        }
     }
 }, { timestamps: true });
 

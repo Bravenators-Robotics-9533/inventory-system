@@ -15,6 +15,7 @@ import ErrorPopup from "./ErrorPopup";
 import SettingsPopup from "../Popup/SettingsPopup"
 
 import ActionUndoPopup from "./ActionUndoPopup";
+import UniqueItemList from "./UniqueItemList";
 
 const InventoryType = {
     Generic: "Generic",
@@ -58,7 +59,9 @@ export default function Inventory({ applicationState, projectID, dbUser, theme, 
 
     const actionUndoPopupRef = useRef();
     const errorPopupRef = useRef();
+
     const genericItemListRef = useRef();
+    const uniqueItemListRef = useRef();
     
     const searchInputRef = useRef();
     
@@ -102,7 +105,8 @@ export default function Inventory({ applicationState, projectID, dbUser, theme, 
         if(key.match(ValidInputRegex)) {
             if(key === "Enter" || key === "Tab") { // Finish of Barcode
                 if(keyLog.trim()) {
-                    genericItemListRef.current.processData(keyLog);
+                    if(currentInventoryType === InventoryType.Generic)
+                        genericItemListRef.current.processData(keyLog);
                     clearInterval(clearKeyLogInterval.current);
                     keyLog = "";
                 }
@@ -168,6 +172,11 @@ export default function Inventory({ applicationState, projectID, dbUser, theme, 
             {
                 currentInventoryType === InventoryType.Generic &&
                 <GenericItemList ref={genericItemListRef} applicationState={applicationState} errorPopupRef={errorPopupRef} project={project} setProject={setProject} currentSearchText={currentSearchText} actionUndoPopupRef={actionUndoPopupRef} />
+            }
+
+            {
+                currentInventoryType === InventoryType.Unique &&
+                <UniqueItemList ref={uniqueItemListRef} applicationState={applicationState} project={project} />
             }
         </section>
         <Outlet />

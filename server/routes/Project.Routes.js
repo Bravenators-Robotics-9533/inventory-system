@@ -152,6 +152,28 @@ router.route('/remove-user-from-project').post(authorize(AuthLevel.Admin), async
     targetProject.save();
 
     return res.send(targetProject); // OK
-})
+});
+
+router.route('/generate-asset-tags').post(authorize(AuthLevel.Basic), async (req, res) => {
+    
+    const { projectID, quantity } = req.body;
+
+    if(!projectID || !quantity)
+        return res.send(400); // Bad Req
+
+    let targetProject = await Project.findById(projectID);
+
+    if(!targetProject)
+        return res.send(400); // Bad Req
+
+    const currentIndex = targetProject.assets.__index__;
+
+    const start = currentIndex + 1;
+    const end = start + quantity;
+
+    const generatedAssetTagKeys = [...Array(end - start).keys()].map(x => x + start);
+
+    res.send(generatedAssetTagKeys);
+});
 
 module.exports = router;
