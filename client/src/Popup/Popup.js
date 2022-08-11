@@ -5,7 +5,7 @@ import { useEffect, useCallback, useState, useRef, cloneElement } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faX } from '@fortawesome/free-solid-svg-icons'
 
-export default function Popup({ isActive = false, popupName = "", submitButtonName="Submit", onSubmit, onClose, children, closeOnSubmit=true }) {
+export default function Popup({ id = undefined, isActive = false, popupName = "", submitButtonName="Submit", onSubmit, onClose, children, closeOnSubmit=true }) {
 
     const validations = useRef({});
 
@@ -60,7 +60,7 @@ export default function Popup({ isActive = false, popupName = "", submitButtonNa
                     <h1>{popupName}</h1>
                     <FontAwesomeIcon icon={faX} className="fa-icon" onClick={onClose} />
                 </div>
-                <div className="content">
+                <div className="content" id={id}>
                     {modifiedChildren}
                 </div>
                 {

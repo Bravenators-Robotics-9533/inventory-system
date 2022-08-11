@@ -156,6 +156,8 @@ export default function Inventory({ applicationState, projectID, dbUser, theme, 
                     <FontAwesomeIcon icon={faPlus} className="fa-icon" onClick={() => {
                         if(currentInventoryType === InventoryType.Generic)
                             genericItemListRef.current.setIsNewItemPopupActive(true); 
+                        else if(currentInventoryType === InventoryType.Unique)
+                            uniqueItemListRef.current.createNewAsset();
                     }} />
                     <input type="text" name="part-search" className={isSearchDisplayed ? "displayed" : null} id="part-search" placeholder="Search..." ref={searchInputRef}
                     onChange={(e) => { setCurrentSearchText(e.target.value.toLowerCase()); }} />

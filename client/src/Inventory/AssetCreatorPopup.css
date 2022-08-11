@@ -1,0 +1,37 @@
+#asset-creator-popup .split {
+    display: flex;
+    justify-content: space-between;
+    margin: 2em 0 0 0;
+}
+
+#asset-creator-popup .split .right .img {
+    width: 150px;
+    height: 150px;
+    background-color: #eeeeee;
+    margin: 0 2em 0 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#asset-creator-popup .split .right .img:hover {
+    background-color: #cdcdcd;
+}
+
+#asset-creator-popup .split .right .img .fa-icon {
+    color: #333333;
+    width: 40%;
+    height: 40%;
+}
+
+#asset-creator-popup .split .right .controls {
+    margin: 1em 2em 0 0;
+}
+
+#asset-creator-popup .split .right .controls .bar {
+    width: 2px;
+    height: 20px;
+    background-color: var(--text-color);
+}

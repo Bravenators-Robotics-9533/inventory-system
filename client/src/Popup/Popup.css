@@ -75,6 +75,14 @@ section.popup .row {
     margin: 1em 0;
 }
 
+section.popup .row.oneline {
+    flex-direction: column;
+}
+
 section.popup .input-field input {
     width: 50%;
+}
+
+section.popup .input-field.oneline input {
+    width: 100%;
 }

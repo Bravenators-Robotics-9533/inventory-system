@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect, forwardRef } from "react";
 
 import "./Popup.css"
 
-const PopupInputField = ({ name, placeholder="", startingValue="", style, reportValidation, customValidationCallback, type="text" }, ref) => {
+const PopupInputField = ({ name, placeholder="", startingValue="", style, reportValidation, customValidationCallback, type="text", oneline=false }, ref) => {
 
     const [isValid, setIsValid] = useState(true);
 
@@ -26,7 +26,8 @@ const PopupInputField = ({ name, placeholder="", startingValue="", style, report
     const onChange = useCallback(() => {
         let validation = customValidate();
 
-        reportValidation(name, validation);
+        if(reportValidation)
+            reportValidation(name, validation);
         setIsValid(validation);
     }, [setIsValid, reportValidation, name, customValidate]);
 
@@ -39,7 +40,7 @@ const PopupInputField = ({ name, placeholder="", startingValue="", style, report
     }, [ref, startingValue, onChange]);
 
     return (
-        <div className="row input-field" key={name}>
+        <div className={`row input-field ${oneline ? 'oneline' : undefined}`} key={name}>
             <h1 style={!isValid ? {color: "red"} : null}>{name}</h1>
             <input type={type} name={name} id={name} style={style} placeholder={placeholder} defaultValue={startingValue} ref={ref} onChange={onChange} />
         </div>

@@ -156,9 +156,9 @@ router.route('/remove-user-from-project').post(authorize(AuthLevel.Admin), async
 
 router.route('/generate-asset-tags').post(authorize(AuthLevel.Basic), async (req, res) => {
     
-    const { projectID, quantity } = req.body;
+    const { projectID, assetData, quantity } = req.body;
 
-    if(!projectID || !quantity)
+    if(!projectID || !assetData || !quantity)
         return res.send(400); // Bad Req
 
     let targetProject = await Project.findById(projectID);
