@@ -68,6 +68,29 @@ router.route('/update-item').post(authorize(AuthLevel.Basic), async(req, res) =>
 
 });
 
+router.route('/delete-item/:projectID/:barcode').delete(authorize(AuthLevel.Basic), async(req, res) => {
+    const user = req.user;
+    const { projectID, barcode } = req.params;
+
+    if(!barcode || !projectID)
+        return res.sendStatus(400); // Client Error
+
+    if(user.userType === "Admin") { // Admin
+
+        let project = await Project.findById(projectID);
+
+        project.inventoryItems.delete(barcode);
+
+        project.markModified('inventoryItems');
+        project.save();
+
+        return res.send({project: project});
+    } else { // TODO: Check to see if their on the allowed projects list
+        res.sendStatus(403); // Forbidden
+    }
+});
+
+
 /*
  * Client Error Codes
  *

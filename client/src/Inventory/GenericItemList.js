@@ -38,6 +38,14 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
         })
     }, [project, applicationState, setProject]);
 
+    const deleteInventoryItem = useCallback((barcode) => {
+        server.delete(`/projects/delete-item/${project._id}/${barcode}`, {
+            headers: { authorization: applicationState.accessToken }
+        }).then((res) => {
+            setProject(res.data.project);
+        })
+    }, [project, applicationState, setProject]);
+
     const createNewItem = useCallback(() => {
         const barcode = createNewItemBarcodeFieldRef.current.value;
         const manufacturer = createNewItemManufacturerFieldRef.current.value;
@@ -176,8 +184,8 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
                     <tbody>
                         {
                             inventoryItemElements.map((element) => {
-                                return <InventoryItem key={element.element} barcode={element.element} searchQuery={currentSearchText} 
-                                {...element.itemData} />
+                                return <InventoryItem key={element.element} updateInventoryItem={updateInventoryItem} barcode={element.element} searchQuery={currentSearchText} 
+                                {...element.itemData} deleteInventoryItem={deleteInventoryItem} />
                             })
                         }
                     </tbody>
