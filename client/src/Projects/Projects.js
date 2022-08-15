@@ -37,16 +37,7 @@ export default function Projects({ applicationState, theme, setTheme }) {
                 }).then((res) => {
                     setProjects(res.data);
                     setIsReady(true);
-                }).catch((res) => {
-                    const resStatus = res.response.status;
-                                        
-                    // Basic User
-                    if(resStatus === 403) {
-                        // TODO: Load allowed projects
-                        setProjects([]);
-                        setIsReady(true);
-                    }
-                })
+                });
             });
 
             return;

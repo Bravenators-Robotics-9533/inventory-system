@@ -24,7 +24,18 @@ router.route('/get-all').get(authorize(AuthLevel.Basic), async(req, res) => {
         const allProjects = await Project.find();
         res.send(allProjects);
     } else {
-        res.send([]);
+        let allowedProjects = [];
+
+        const allProjects = await Project.find();
+
+        allProjects.forEach((project) => {
+            if(project.allowedUsers?.includes(user._id)) {
+                allowedProjects.push(project);
+            }
+        });
+
+        res.send(allowedProjects);
+
     }
 });
 
@@ -33,15 +44,12 @@ router.route('/get/:id').get(authorize(AuthLevel.Basic), async(req, res) => {
     const user = req.user;
     const { id } = req.params;
 
-    if(user.userType === "Admin") { // Admin
+    const project = await Project.findById(id);
 
-        const project = await Project.findById(id);
+    if(user.userType === "Admin" || project.allowedUsers?.includes(user._id))
         return res.send(project);
 
-    } else {
-        res.sendStatus(403); // Forbidden
-    }
-
+    return res.sendStatus(403); // Forbidden
 });
 
 router.route('/update-item').post(authorize(AuthLevel.Basic), async(req, res) => {
@@ -52,19 +60,17 @@ router.route('/update-item').post(authorize(AuthLevel.Basic), async(req, res) =>
     if(!projectID || !itemBarcode || !itemData)
         return res.sendStatus(400); // Client Error
 
-    if(user.userType === "Admin") { // Admin
+    let project = await Project.findById(projectID);
 
-        let project = await Project.findById(projectID);
+    if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
+        return res.sendStatus(403);
 
-        project.inventoryItems.set(itemBarcode, itemData);
+    project.inventoryItems.set(itemBarcode, itemData);
 
-        project.markModified('inventoryItems');
-        project.save();
+    project.markModified('inventoryItems');
+    project.save();
 
-        return res.send({project: project});
-    } else { // TODO: Check to see if their on the allowed projects list
-        res.sendStatus(403); // Forbidden
-    }
+    return res.send({project: project});
 
 });
 
@@ -75,21 +81,19 @@ router.route('/delete-item/:projectID/:barcode').delete(authorize(AuthLevel.Basi
     if(!barcode || !projectID)
         return res.sendStatus(400); // Client Error
 
-    if(user.userType === "Admin") { // Admin
+    let project = await Project.findById(projectID);
 
-        let project = await Project.findById(projectID);
+    if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
+        return res.sendStatus(403);
 
-        project.inventoryItems.delete(barcode);
+    project.inventoryItems.delete(barcode);
 
-        project.markModified('inventoryItems');
-        project.save();
+    project.markModified('inventoryItems');
+    project.save();
 
-        return res.send({project: project});
-    } else { // TODO: Check to see if their on the allowed projects list
-        res.sendStatus(403); // Forbidden
-    }
+    return res.send({project: project});
+
 });
-
 
 /*
  * Client Error Codes
@@ -106,29 +110,29 @@ router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req
     if(!projectID || !itemBarcode || !value)
         return res.sendStatus(400); // Client Error
 
-    if(user.userType === "Admin") { // Admin
-        let project = await Project.findById(projectID);
+    let project = await Project.findById(projectID);s
 
-        if(!project.inventoryItems.has(itemBarcode)) {
-            return res.status(400).send({clientErrorCode: 1}); // Client Error
-        }
+    // Validate
+    if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
+        return res.sendStatus(403);
 
-        let data = project.inventoryItems.get(itemBarcode);
-        data.quantity = Number.parseInt(data.quantity) + value;
-
-        if(data.quantity < 0) {
-            return res.status(400).send({clientErrorCode: 2}); // Client Error
-        }
-
-        project.inventoryItems.set(itemBarcode, data);
-
-        project.markModified('inventoryItems');
-        project.save();
-
-        return res.send({project: project});
-    } else { // TODO: FIx
-        
+    if(!project.inventoryItems.has(itemBarcode)) {
+        return res.status(400).send({clientErrorCode: 1}); // Client Error
     }
+
+    let data = project.inventoryItems.get(itemBarcode);
+    data.quantity = Number.parseInt(data.quantity) + value;
+
+    if(data.quantity < 0) {
+        return res.status(400).send({clientErrorCode: 2}); // Client Error
+    }
+
+    project.inventoryItems.set(itemBarcode, data);
+
+    project.markModified('inventoryItems');
+    project.save();
+
+    return res.send({project: project});
 
 });
 
