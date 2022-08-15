@@ -45,7 +45,6 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
         const startingQuantity = createNewItemStartingQuantityFieldRef.current.value;
 
         if(project.inventoryItems[barcode]) {
-            console.log("Hello");
             return;
         }
 
@@ -154,10 +153,10 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
         <>
             <Popup isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); }} 
             onSubmit={createNewItem}>
-                <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} />
-                <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} />
-                <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} />
-                <PopupInputField key="Starting Quantity" name="Starting Quantity" startingValue={0} style={{width: "4em", textAlign: "center"}} 
+                <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} oneline />
+                <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} oneline />
+                <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} oneline />
+                <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={0} style={{width: "4em", textAlign: "center"}} 
                 ref={createNewItemStartingQuantityFieldRef} type="number" customValidationCallback={() => {
                     const value = createNewItemStartingQuantityFieldRef.current.value;
                     return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
