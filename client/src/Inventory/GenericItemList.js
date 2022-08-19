@@ -3,7 +3,7 @@ import { useState, useEffect, forwardRef, useRef, useImperativeHandle, useCallba
 import { server } from "../ServerAPI";
 
 import useSound from "use-sound";
-import { addItemSound, removeItemSound } from "../Sound/Sound";
+import { addItemSound, needsAttentionSound, removeItemSound } from "../Sound/Sound";
 
 import Popup from "../Popup/Popup";
 
@@ -21,6 +21,8 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
     
+    const defaultCreateNewItemBarcodeValueRef = useRef(null);
+
     const createNewItemBarcodeFieldRef = useRef();
     const createNewItemManufacturerFieldRef = useRef();
     const createNewItemItemNameFieldRef = useRef();
@@ -29,6 +31,7 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     const [playAddItemSound] = useSound(addItemSound, { volume: 0.5 });
     const [playRemoveItemSound] = useSound(removeItemSound, { volume: 0.5 });
+    const [playNeedsAttentionSound] = useSound(needsAttentionSound, { volume: 0.75 });
 
     const updateInventoryItem = useCallback((barcode, data) => {
         server.post(`/projects/update-item`, {
@@ -98,13 +101,15 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
             if(!clientErrorCode)
                 return;
 
-            if(clientErrorCode === 1) {
-                console.log("Unknown Item!");
+            if(clientErrorCode === 1) { // Unknown Item
+                playNeedsAttentionSound();
+                defaultCreateNewItemBarcodeValueRef.current = barcode;
+                setIsNewItemPopupActive(true);
             } else if(clientErrorCode === 2) { // Attempting to change quantity to less than 0
                 errorPopupRef.current.runError("Invalid Item Quantity", "Item quantity is already 0. Maybe you meant to add it?");
             }
         });
-    }, [project, applicationState, setProject, playAddItemSound, playRemoveItemSound, actionUndoPopupRef, errorPopupRef]);
+    }, [project, applicationState, setProject, playAddItemSound, playRemoveItemSound, playNeedsAttentionSound, actionUndoPopupRef, errorPopupRef]);
 
     const toggleCurrentMode = useCallback(() => {
         setCurrentMode((curr) => { return curr === "add" ? "remove" : "add"});
@@ -151,11 +156,12 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     return (
         <>
-            <Popup id="generic-item-creation" isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); setCreateNewItemImageURL(null); }} 
+            <Popup id="generic-item-creation" isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); setCreateNewItemImageURL(null); defaultCreateNewItemBarcodeValueRef.current = null; }} 
             onSubmit={createNewItem}>
                 <div key="1" style={{display: "flex", justifyContent: "space-between"}} className="split">
                     <div key="2" style={{width: "40%"}}>
-                        <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} oneline />
+                        <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} startingValue={defaultCreateNewItemBarcodeValueRef.current ? 
+                        defaultCreateNewItemBarcodeValueRef.current : undefined} oneline />
                         <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} oneline />
                         <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} oneline />
                         <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={0} style={{width: "4em", textAlign: "center"}} 

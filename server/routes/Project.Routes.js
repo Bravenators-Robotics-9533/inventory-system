@@ -65,6 +65,10 @@ router.route('/update-item').post(authorize(AuthLevel.Basic), async(req, res) =>
     if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
         return res.sendStatus(403);
 
+    if(itemBarcode.trim().length === 0) {
+        return res.sendStatus(400);
+    }    
+
     project.inventoryItems.set(itemBarcode, itemData);
 
     project.markModified('inventoryItems');
@@ -110,7 +114,7 @@ router.route('/modify-item-quantity').post(authorize(AuthLevel.Basic), async(req
     if(!projectID || !itemBarcode || !value)
         return res.sendStatus(400); // Client Error
 
-    let project = await Project.findById(projectID);s
+    let project = await Project.findById(projectID);
 
     // Validate
     if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
