@@ -184,3 +184,49 @@ section#inventory .inventory-item td.info span:hover .img {
 section#inventory .inventory-item td.info span:hover .controls {
     display: block;
 }
+
+#generic-item-creation .split .right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#generic-item-creation .img {
+    width: 250px;
+    height: 250px;
+    background-color: tomato;
+    border-radius: 5px;
+    position: relative;
+}
+
+#generic-item-creation .img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+}
+
+#generic-item-creation .img .img-controls {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin: 0 0 15px 0;
+}
+
+#generic-item-creation .img .img-controls .fa-icon {
+    cursor: pointer;
+}
+
+#generic-item-creation .img img:hover {
+    filter: brightness(80%);
+}
+
+#generic-item-creation .controls {
+    width: 250px;
+    height: 250px;
+    background-color: var(--offset-hover-color);
+    top: 5px;
+    right: -500px;
+    border-radius: 5px;
+}

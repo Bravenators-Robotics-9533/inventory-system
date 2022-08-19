@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect, forwardRef } from "react";
 
 import "./Popup.css"
 
-const PopupInputField = ({ name, placeholder="", startingValue="", style, reportValidation, customValidationCallback, type="text", oneline=false }, ref) => {
+const PopupInputField = ({ name, placeholder="", startingValue="", style, customValidationCallback, type="text", oneline=false }, ref) => {
 
     const [isValid, setIsValid] = useState(true);
 
@@ -26,10 +26,10 @@ const PopupInputField = ({ name, placeholder="", startingValue="", style, report
     const onChange = useCallback(() => {
         let validation = customValidate();
 
-        if(reportValidation)
-            reportValidation(name, validation);
+        // if(reportValidation)
+        //     reportValidation(name, validation);
         setIsValid(validation);
-    }, [setIsValid, reportValidation, name, customValidate]);
+    }, [setIsValid, customValidate]);
 
     useEffect(() => {
 

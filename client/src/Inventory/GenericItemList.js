@@ -10,6 +10,9 @@ import Popup from "../Popup/Popup";
 import InventoryItem from "./InventoryItem";
 import PopupInputField from "../Popup/PopupInputField";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+
 const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, setProject, currentSearchText, actionUndoPopupRef }, ref) => {
 
     const [currentMode, setCurrentMode] = useState("add");
@@ -22,6 +25,7 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
     const createNewItemManufacturerFieldRef = useRef();
     const createNewItemItemNameFieldRef = useRef();
     const createNewItemStartingQuantityFieldRef = useRef();
+    const [createNewItemImageURL, setCreateNewItemImageURL] = useState(null);
 
     const [playAddItemSound] = useSound(addItemSound, { volume: 0.5 });
     const [playRemoveItemSound] = useSound(removeItemSound, { volume: 0.5 });
@@ -51,13 +55,14 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
         const manufacturer = createNewItemManufacturerFieldRef.current.value;
         const itemName = createNewItemItemNameFieldRef.current.value;
         const startingQuantity = createNewItemStartingQuantityFieldRef.current.value;
+        const imageURL = createNewItemImageURL;
 
         if(project.inventoryItems[barcode]) {
             return;
         }
 
-        updateInventoryItem(barcode, { name: itemName, manufacturer: manufacturer, quantity: startingQuantity });
-    }, [project, updateInventoryItem]);
+        updateInventoryItem(barcode, { name: itemName, manufacturer: manufacturer, quantity: startingQuantity, imageURL: imageURL });
+    }, [project, updateInventoryItem, createNewItemImageURL]);
 
     const modifyItemQuantity = useCallback((barcode, value) => {
         server.post(`/projects/modify-item-quantity`, {
@@ -127,19 +132,6 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
             }
         },
 
-        createNewItem() {
-            const barcode = createNewItemBarcodeFieldRef.current.value;
-            const manufacturer = createNewItemManufacturerFieldRef.current.value;
-            const itemName = createNewItemItemNameFieldRef.current.value;
-            const startingQuantity = createNewItemStartingQuantityFieldRef.current.value;
-    
-            if(project.inventoryItems[barcode]) {
-                return;
-            }
-    
-            updateInventoryItem(barcode, { name: itemName, manufacturer: manufacturer, quantity: startingQuantity });
-        },
-
         isNewItemPopupActive() { return isNewItemPopupActive; },
         setIsNewItemPopupActive(value) { setIsNewItemPopupActive(value); },
     }));
@@ -159,16 +151,46 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     return (
         <>
-            <Popup isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); }} 
+            <Popup id="generic-item-creation" isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); setCreateNewItemImageURL(null); }} 
             onSubmit={createNewItem}>
-                <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} oneline />
-                <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} oneline />
-                <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} oneline />
-                <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={0} style={{width: "4em", textAlign: "center"}} 
-                ref={createNewItemStartingQuantityFieldRef} type="number" customValidationCallback={() => {
-                    const value = createNewItemStartingQuantityFieldRef.current.value;
-                    return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
-                }} />
+                <div key="1" style={{display: "flex", justifyContent: "space-between"}} className="split">
+                    <div key="2" style={{width: "40%"}}>
+                        <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} oneline />
+                        <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} oneline />
+                        <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} oneline />
+                        <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={0} style={{width: "4em", textAlign: "center"}} 
+                        ref={createNewItemStartingQuantityFieldRef} type="number" customValidationCallback={() => {
+                            const value = createNewItemStartingQuantityFieldRef.current.value;
+                            return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
+                        }} />
+                    </div>
+                    <div key="3" style={{width: "50%"}} className="right" >
+                        <div className="img">
+                            {
+                                createNewItemImageURL && 
+                                <img src={createNewItemImageURL} alt="" />
+                            }
+                            <div className="img-controls">
+                                <FontAwesomeIcon className="fa-icon" icon={faPencil} onClick={() => {
+                                    const value = window.prompt("Enter URL");
+                                    setCreateNewItemImageURL(value);
+                                }} />
+                                {
+                                    createNewItemImageURL &&
+                                    <FontAwesomeIcon className="fa-icon" icon={faTrash} onClick={() => {
+                                        const result = window.confirm("Are you sure you want to remove this image?");
+
+                                        if(!result)
+                                            return;
+
+                                        setCreateNewItemImageURL(null);
+                                    }} />
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div key="4" />
             </Popup>
 
             <div className="table-wrapper" id="generic-item-list">
