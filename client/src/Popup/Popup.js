@@ -30,19 +30,40 @@ export default function Popup({ id = undefined, isActive = false, popupName = ""
 
     }, [setIsValid, validations]);
 
+    const createChildren = useCallback((children) => {
+        let modifiedChildrenArray = [];
+
+        for(let i = 0; i < children.length; i++) {
+
+            let grandChildrenArray = [];
+
+            if(children[i].props.children) {
+                grandChildrenArray = createChildren(children[i].props.children);
+            }
+
+            let props = { children: grandChildrenArray, reportValidation: reportValidation, ref: children[i].ref };
+
+            if(typeof children[i].type !== 'string') {
+                props.reportValidation = reportValidation;
+            }
+
+            const element = cloneElement(children[i], props);
+            modifiedChildrenArray.push(element);
+        }
+
+        return modifiedChildrenArray;
+    }, [reportValidation]);
+
     useEffect(() => {
         let modifiedChildrenArray = [];
 
         if(children) {
-            for(let i = 0; i < children.length; i++) {
-                const element = cloneElement(children[i], {reportValidation: reportValidation, ref: children[i].ref});
-                modifiedChildrenArray.push(element);
-            }
+            modifiedChildrenArray = createChildren(children);
         }
 
         setModifiedChildren(modifiedChildrenArray);
         setIsReady(true);
-    }, [children, setModifiedChildren, setIsReady, reportValidation]);
+    }, [children, setModifiedChildren, setIsReady, reportValidation, createChildren]);
 
     const submit = () => {
         if(closeOnSubmit)

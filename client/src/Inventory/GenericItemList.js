@@ -21,7 +21,8 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     const [isNewItemPopupActive, setIsNewItemPopupActive] = useState(false);
     
-    const defaultCreateNewItemBarcodeValueRef = useRef(null);
+    const [defaultCreateNewItemBarcodeValueRef, setDefaultCreateNewItemBarcodeValueRef] = useState(null);
+    const [defaultCreateNewItemStartingValueRef, setDefaultCreateNewItemStartingValueRef] = useState(0);
 
     const createNewItemBarcodeFieldRef = useRef();
     const createNewItemManufacturerFieldRef = useRef();
@@ -103,13 +104,14 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
             if(clientErrorCode === 1) { // Unknown Item
                 playNeedsAttentionSound();
-                defaultCreateNewItemBarcodeValueRef.current = barcode;
+                setDefaultCreateNewItemBarcodeValueRef(barcode);
+                setDefaultCreateNewItemStartingValueRef(100);
                 setIsNewItemPopupActive(true);
             } else if(clientErrorCode === 2) { // Attempting to change quantity to less than 0
                 errorPopupRef.current.runError("Invalid Item Quantity", "Item quantity is already 0. Maybe you meant to add it?");
             }
         });
-    }, [project, applicationState, setProject, playAddItemSound, playRemoveItemSound, playNeedsAttentionSound, actionUndoPopupRef, errorPopupRef]);
+    }, [project, applicationState, setProject, playAddItemSound, playRemoveItemSound, playNeedsAttentionSound, actionUndoPopupRef, errorPopupRef, setDefaultCreateNewItemBarcodeValueRef, setDefaultCreateNewItemStartingValueRef]);
 
     const toggleCurrentMode = useCallback(() => {
         setCurrentMode((curr) => { return curr === "add" ? "remove" : "add"});
@@ -156,27 +158,33 @@ const GenericItemList = forwardRef(({ applicationState, errorPopupRef, project, 
 
     return (
         <>
-            <Popup id="generic-item-creation" isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { setIsNewItemPopupActive(false); setCreateNewItemImageURL(null); defaultCreateNewItemBarcodeValueRef.current = null; }} 
+            <Popup id="generic-item-creation" isActive={isNewItemPopupActive} popupName="Create Item" submitButtonName="Create" onClose={() => { 
+                setIsNewItemPopupActive(false); 
+                setCreateNewItemImageURL(null); 
+
+                setDefaultCreateNewItemBarcodeValueRef(null); 
+                setDefaultCreateNewItemStartingValueRef(0);
+            }} 
             onSubmit={createNewItem}>
                 <div key="1" style={{display: "flex", justifyContent: "space-between"}} className="split">
                     <div key="2" style={{width: "40%"}}>
-                        <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} startingValue={defaultCreateNewItemBarcodeValueRef.current ? 
-                        defaultCreateNewItemBarcodeValueRef.current : undefined} oneline />
+                        <PopupInputField key="Barcode" name="Barcode" ref={createNewItemBarcodeFieldRef} startingValue={defaultCreateNewItemBarcodeValueRef ? 
+                        defaultCreateNewItemBarcodeValueRef : undefined} oneline />
                         <PopupInputField key="Manufacturer" name="Manufacturer" ref={createNewItemManufacturerFieldRef} oneline />
                         <PopupInputField key="Item Name" name="Item Name" ref={createNewItemItemNameFieldRef} oneline />
-                        <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={0} style={{width: "4em", textAlign: "center"}} 
+                        <PopupInputField key="Starting Quantity" name="Starting Quantity" oneline startingValue={defaultCreateNewItemStartingValueRef} style={{width: "4em", textAlign: "center"}} 
                         ref={createNewItemStartingQuantityFieldRef} type="number" customValidationCallback={() => {
                             const value = createNewItemStartingQuantityFieldRef.current.value;
                             return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) >= 0
                         }} />
                     </div>
                     <div key="3" style={{width: "50%"}} className="right" >
-                        <div className="img">
+                        <div className="img" key="img">
                             {
                                 createNewItemImageURL && 
                                 <img src={createNewItemImageURL} alt="" />
                             }
-                            <div className="img-controls">
+                            <div className="img-controls" key='img-controls'>
                                 <FontAwesomeIcon className="fa-icon" icon={faPencil} onClick={() => {
                                     const value = window.prompt("Enter URL");
                                     setCreateNewItemImageURL(value);
