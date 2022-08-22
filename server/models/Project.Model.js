@@ -18,6 +18,10 @@ const projectSchema = new Schema({
         of: Object,
         default: {}
     },
+    assetDefinitions: {
+        type: Object,
+        default: {}
+    },
     assets: {
         type: Object,
         default: {

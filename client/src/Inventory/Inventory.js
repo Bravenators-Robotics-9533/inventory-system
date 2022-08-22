@@ -178,7 +178,7 @@ export default function Inventory({ applicationState, projectID, dbUser, theme, 
 
             {
                 currentInventoryType === InventoryType.Unique &&
-                <UniqueItemList ref={uniqueItemListRef} applicationState={applicationState} project={project} />
+                <UniqueItemList ref={uniqueItemListRef} applicationState={applicationState} project={project} setProject={setProject} />
             }
         </section>
         <Outlet />

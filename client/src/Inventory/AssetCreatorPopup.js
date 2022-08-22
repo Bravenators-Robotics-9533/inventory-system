@@ -1,20 +1,46 @@
-import { forwardRef, useState, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useState, useImperativeHandle, useRef, useCallback } from 'react';
 
 import Popup from '../Popup/Popup';
 import PopupInputField from '../Popup/PopupInputField';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faImage, faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
+
+import { server } from "../ServerAPI";
 
 import "./AssetCreatorPopup.css"
 
-const AssetCreatorPopup = forwardRef((props, ref) => {
+const AssetCreatorPopup = forwardRef(({ projectID, accessToken, setProject }, ref) => {
 
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(false);
+
+    const [imageURL, setImageURL] = useState(null);
 
     const productSKURef = useRef();
     const manuBarcodeRef = useRef();
-    const quantityRef = useRef();
+    const productNameRef = useRef();
+
+    const onSubmit = useCallback(() => {
+
+        const name = productNameRef.current?.value;
+        const manuBarcode = manuBarcodeRef.current?.value;
+        const sku = productSKURef.current?.value;
+        
+        const assetDefinition = { name: name, sku: sku, imageURL: imageURL };
+
+        // console.log(assetDefinition);
+        server.post('projects/create-asset-definition', {
+            projectID: projectID,
+            manuBarcode: manuBarcode,
+            assetDefinition: assetDefinition
+        }, {
+            headers: { authorization: accessToken }
+        }).then(res => {
+            if(res?.data)
+                setProject(res.data)
+        })
+
+    }, [productSKURef, manuBarcodeRef, imageURL, projectID, accessToken, setProject]);
 
     useImperativeHandle(ref, () => ({
         show() {
@@ -23,27 +49,44 @@ const AssetCreatorPopup = forwardRef((props, ref) => {
     }));
 
     return (
-        <Popup id="asset-creator-popup" isActive={isVisible} popupName="Generate Assets" submitButtonName="Generate" onSubmit={undefined} onClose={() => setIsVisible(false) }>
+        <Popup id="asset-creator-popup" isActive={isVisible} popupName="Create New Asset Type" submitButtonName="Generate" onSubmit={onSubmit} onClose={() => 
+            {
+                setIsVisible(false);
+                setImageURL(null);
+            }}>
             <></>
             <div className="split">
                 <div style={{width: "45%"}}>
                     <PopupInputField key="Manufacturer's Barcode" ref={manuBarcodeRef} name="Manufacturer's Barcode" oneline />
                     <PopupInputField key="Product SKU" ref={productSKURef} name="Product SKU" oneline />
-                    <PopupInputField key="Quantity" name="Quantity" ref={quantityRef} startingValue={1} style={{width: "4em", textAlign: "center"}} oneline 
-                    type="number" customValidationCallback={() => {
-                        const value = quantityRef.current.value;
-                        return Number.isInteger(Number.parseInt(value)) && Number.parseInt(value) > 0
-                    }}/>
+                    <PopupInputField kye="Product Name" ref={productNameRef} name="Product Name" oneline/>
                 </div>
                 <div className="right">
-                    <div className="img">
-                        <FontAwesomeIcon className="fa-icon" icon={faImage} />
+                    
+                    <div className="img" key="img">
+                        {
+                            imageURL && 
+                            <img src={imageURL} alt="" />
+                        }
+                        <div className="img-controls" key='img-controls'>
+                            <FontAwesomeIcon className="fa-icon" icon={faPencil} onClick={() => {
+                                const value = window.prompt("Enter URL");
+                                setImageURL(value);
+                            }} />
+                            {
+                                imageURL &&
+                                <FontAwesomeIcon className="fa-icon" icon={faTrash} onClick={() => {
+                                    const result = window.confirm("Are you sure you want to remove this image?");
+
+                                    if(!result)
+                                        return;
+
+                                    setImageURL(null);
+                                }} />
+                            }
+                        </div>
                     </div>
-                    <div className="controls">
-                        <FontAwesomeIcon className="fa-icon" icon={faPencil} />
-                        <div className="bar"></div>
-                        <FontAwesomeIcon className="fa-icon" icon={faTrash} />
-                    </div>
+
                 </div>
             </div>
         </Popup>

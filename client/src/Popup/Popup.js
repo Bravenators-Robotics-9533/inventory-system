@@ -35,16 +35,20 @@ export default function Popup({ id = undefined, isActive = false, popupName = ""
 
         for(let i = 0; i < children.length; i++) {
 
-            let grandChildrenArray = [];
+            let props = undefined;
 
-            if(children[i].props.children) {
-                grandChildrenArray = createChildren(children[i].props.children);
-            }
+            if(typeof children[i].type === 'object') {
+                let grandChildrenArray = [];
 
-            let props = { children: grandChildrenArray, reportValidation: reportValidation, ref: children[i].ref };
+                if(children[i].props?.children) {
+                    grandChildrenArray = createChildren(children[i].props.children);
+                }
 
-            if(typeof children[i].type !== 'string') {
-                props.reportValidation = reportValidation;
+                props = { reportValidation: reportValidation, ref: children[i].ref };
+                
+                if(grandChildrenArray.length > 0) {
+                    props.children = grandChildrenArray;
+                }
             }
 
             const element = cloneElement(children[i], props);

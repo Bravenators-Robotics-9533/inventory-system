@@ -1,0 +1,124 @@
+#unique-item-list {
+    margin: 5em 0 0 0;
+    text-align: center;
+}
+
+#unique-item-list > h1 {
+    font-size: 2rem;
+}
+
+#unique-item-list #asset-list {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#unique-item-list #asset-list .col {
+    width: 30%;
+}
+
+#unique-item-list .asset-definition {
+    width: 100%;
+    background-color: var(--offset-color);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #000000;
+    padding: 1em 10px;
+    margin: 1em 0;
+}
+
+#unique-item-list .asset-definition .content {
+    width: 100%;
+}
+
+#unique-item-list .asset-definition .delete-btn {
+    background-color: var(--red);
+    cursor: pointer;
+}
+
+#unique-item-list .asset-definition .delete-btn:hover {
+    background-color: rgb(219, 0, 0);
+}
+
+#unique-item-list .asset-definition ul {
+    list-style: none;
+    width: 100%;
+}
+
+#unique-item-list .asset-definition ul > li {
+    font-size: 1.2rem;
+    background-color: var(--bg-color);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 0 0.5em;
+    border-radius: 10px;
+    margin: 0.5em 0;
+    box-shadow: 0 0 3px #000000;
+}
+
+#unique-item-list .asset-definition ul > li > .first-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.25em 0;
+}
+
+#unique-item-list .asset-definition ul > li > .desc {
+    text-align: left;
+    font-weight: 100;
+    font-size: 1rem;
+    margin: 0 0 0.25em 0;
+}
+
+#unique-item-list .asset-definition ul > li:nth-child(even) {
+    background-color: var(--offset-hover-color);
+}
+
+#unique-item-list .asset-definition .inline {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+#unique-item-list .asset-definition .inline .quantity {
+    background-color: var(--offset-hover-color);
+    margin: 0 0 0 1em;
+    width: 35px;
+    height: 35px;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#unique-item-list .asset-definition .inline .quantity p {
+    font-size: 1.5rem;
+    padding: 0;
+    margin: 0;
+    line-height: 0px;
+}
+
+#unique-item-list .asset-definition .content.collapsed {
+    display: none;
+}
+
+#unique-item-list .asset-definition .inline .fa-icon {
+    margin: 0 1em 0 0;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+#unique-item-list .asset-definition img {
+    width: 50%;
+    height: auto;
+    border-radius: 10px;
+    margin: 0.5em 0
+}
+
+#unique-item-list .asset-definition h3 {
+    font-weight: 100;
+}

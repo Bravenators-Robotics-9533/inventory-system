@@ -144,12 +144,12 @@ router.route('/add-user-to-project').put(authorize(AuthLevel.Admin), async (req,
     const { projectID, targetUserID } = req.body;
 
     if(!projectID || !targetUserID)
-        return res.send(400); // Bad Request
+        return res.sendStatus(400); // Bad Request
 
     let targetProject = await Project.findById(projectID);
 
     if(!targetProject)
-        return res.send(400); // Bad Request
+        return res.sendStatus(400); // Bad Request
 
     // TODO: verify the user id is valid
 
@@ -164,12 +164,12 @@ router.route('/remove-user-from-project').post(authorize(AuthLevel.Admin), async
     const { projectID, targetUserID } = req.body;
 
     if(!projectID || !targetUserID)
-        return res.send(400); // Bad Request
+        return res.sendStatus(400); // Bad Request
 
     let targetProject = await Project.findById(projectID);
 
     if(!targetProject)
-        return res.send(400); // Bad Request
+        return res.sendStatus(400); // Bad Request
 
     // TODO: verify the user id is valid
 
@@ -190,12 +190,12 @@ router.route('/generate-asset-tags').post(authorize(AuthLevel.Basic), async (req
     const { projectID, assetData, quantity } = req.body;
 
     if(!projectID || !assetData || !quantity)
-        return res.send(400); // Bad Req
+        return res.sendStatus(400); // Bad Req
 
     let targetProject = await Project.findById(projectID);
 
     if(!targetProject)
-        return res.send(400); // Bad Req
+        return res.sendStatus(400); // Bad Req
 
     const currentIndex = targetProject.assets.__index__;
 
@@ -206,5 +206,30 @@ router.route('/generate-asset-tags').post(authorize(AuthLevel.Basic), async (req
 
     res.send(generatedAssetTagKeys);
 });
+
+router.route('/create-asset-definition').post(authorize(AuthLevel.Basic), async (req, res) => {
+
+    const user = req.user;
+    const { projectID, manuBarcode, assetDefinition } = req.body;
+
+    if(!projectID || !manuBarcode || !assetDefinition) {
+        return res.sendStatus(400);
+    }
+
+    let project = await Project.findById(projectID);
+
+    if(!project)
+        return res.sendStatus(400);
+
+    // Validate
+    if(user.userType !== AuthLevel.Admin && !project.allowedUsers?.includes(user._id))
+        return res.sendStatus(403);
+
+    project.assetDefinitions[manuBarcode] = assetDefinition;
+    project.markModified("assetDefinitions");
+    await project.save();
+ 
+    return res.send(project);
+})
 
 module.exports = router;
