@@ -3,6 +3,7 @@ import { Text, View, SafeAreaView, FlatList, StyleSheet } from "react-native"
 import { server } from "../ServerAPI";
 
 import FullPageLoader from "../FullPageLoader";
+import BarcodeScanner from "./BarcodeScanner"
 
 export default function Project(props) {
 
@@ -61,11 +62,7 @@ export default function Project(props) {
 
     return (
         <SafeAreaView>
-            <FlatList 
-                data={inventoryItems}
-                renderItem={renderItem}
-                keyExtractor={item => item.barcode}
-            />
+            <BarcodeScanner />
         </SafeAreaView>
     )
 
@@ -74,6 +71,5 @@ export default function Project(props) {
 
 const styles = StyleSheet.create({
     inventoryItem: {
-
     }
 });

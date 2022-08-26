@@ -61,10 +61,11 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     projectItem: {
-        marginTop: 20,
-        marginBottom: 20,
         width: "100%",
-        alignItems: "center"
+        height: 65,
+        alignItems: "center",
+        marginTop: 20,
+        justifyContent: "center"
     },
     projectItemText: {
         fontSize: 20,
@@ -74,11 +75,12 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     projectItemTextWrapper: {
-        width: "80%",
-        height: "100%",
-        borderRadius: 10,
-        paddingTop: 20,
-        paddingBottom: 20,
-        backgroundColor: "#dddddd"
+       backgroundColor: "#dddddd",
+       paddingTop: 15,
+       paddingBottom: 15,
+       width: "95%",
+       borderRadius: 10,
+       height: "100%",
+       justifyContent: "center"
     }
 })

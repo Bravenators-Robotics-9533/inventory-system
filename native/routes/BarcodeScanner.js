@@ -48,7 +48,7 @@ export default function BarcodeScanner({}) {
         <View style={styles.container}>
             <SafeAreaView>
                 <View>
-                    <Text style={styles.maintext}>Scanning...</Text>
+                    {/* <Text style={styles.maintext}>Scanning...</Text> */}
                     <View style={styles.barcodebox}>
                         {
                             !scanned ? 
@@ -56,12 +56,12 @@ export default function BarcodeScanner({}) {
                             onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                             style={{height: 400, width: 400}}
                             />
-                            : null
+                            :
+                            <Button title={"Scan Again"} onPress={() => setScanned(false)} color="tomato" />
                         }
                     </View>
                 </View>
                 <View style={styles.bottomView}>
-                    {scanned && <Button title={"Scan Again"} onPress={() => setScanned(false)} color="tomato" />}
                 </View>
             </SafeAreaView>
         </View>
@@ -76,7 +76,8 @@ const styles = StyleSheet.create({
         width: 300,
         overflow: 'hidden',
         borderRadius: 30,
-        backgroundColor: 'tomato'
+        backgroundColor: '#ffb861',
+        marginTop: 30
     },
     maintext: {
         textAlign: "center",
